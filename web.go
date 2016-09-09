@@ -11,14 +11,14 @@ type guac struct {
 }
 
 func (g guac) RealTime() (conn RealTime, err error) {
-	dialer := websocket.New(g.client)
-	RealTimeConn, err := realtime.Connect(dialer)
+	raw, err := websocket.New(g.client).Dial()
 	if err != nil {
 		return
 	}
 
+	realTimeConn := realtime.New(raw)
 	conn = realTime{
-		connection: RealTimeConn,
+		connection: realTimeConn,
 	}
 	return
 }

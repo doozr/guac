@@ -8,20 +8,13 @@ import (
 
 // Connection represents an open Slack RealTime connection
 type Connection struct {
-	dialer slack.Dialer
-	raw    slack.RawConnection
+	raw slack.RawConnection
 }
 
-// Connect to the Slack RealTime API
-func Connect(dialer slack.Dialer) (conn *Connection, err error) {
-	rawConnection, err := dialer.Dial()
-	if err != nil {
-		return
-	}
-
+// New to the Slack RealTime API
+func New(raw slack.RawConnection) (conn *Connection) {
 	conn = &Connection{
-		dialer: dialer,
-		raw:    rawConnection,
+		raw: raw,
 	}
 	return
 }
@@ -35,17 +28,17 @@ func (c Connection) Receive() (event slack.RealTimeEvent, err error) {
 
 	eventObj := realTimeEvent{}
 	err = json.Unmarshal(payload, &eventObj)
-	eventObj.Raw = payload
-	event = eventObj
-
 	if err != nil {
 		return
 	}
 
+	eventObj.Raw = payload
+	event = eventObj
 	return
 }
 
 // Send a Slack RealTime event
 func (c Connection) Send(event slack.RealTimeEvent) (err error) {
+	err = c.raw.Send(event.Payload())
 	return
 }
