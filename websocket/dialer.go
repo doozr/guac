@@ -14,29 +14,6 @@ func New(client slack.WebClient) slack.Dialer {
 	return Dialer{client}
 }
 
-// Connection represents a connected websocket
-type Connection struct {
-	id        string
-	websocket *websocket.Conn
-}
-
-// ID returns the ID associated with the websocket
-func (c Connection) ID() string {
-	return c.id
-}
-
-// Send a payload over the websocket
-func (c Connection) Send(payload []byte) (err error) {
-	err = websocket.Message.Send(c.websocket, payload)
-	return
-}
-
-// Receive a payload from the websocket
-func (c Connection) Receive() (payload []byte, err error) {
-	err = websocket.Message.Receive(c.websocket, &payload)
-	return
-}
-
 // Dialer creates websocket connections to Slack
 type Dialer struct {
 	client slack.WebClient
@@ -61,6 +38,7 @@ func (d Dialer) Dial() (conn slack.RawConnection, err error) {
 	return
 }
 
+// getWebsocketURL via the Web API
 func (d Dialer) getWebsocketURL() (wsurl string, id string, err error) {
 	body, err := d.client.Get("rtm.start", nil)
 	if err != nil {

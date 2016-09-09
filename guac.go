@@ -12,8 +12,9 @@ type Guac interface {
 
 // RealTime interface to Slack RealTime
 type RealTime interface {
-	GetEvent() (slack.RealTimeEvent, error)
+	Receive() (slack.RealTimeEvent, error)
 	PostMessage(channel, text string) error
+	Ping() error
 }
 
 // New Guac instance

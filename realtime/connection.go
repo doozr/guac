@@ -33,7 +33,7 @@ func (c Connection) Receive() (event slack.RealTimeEvent, err error) {
 		return
 	}
 
-	eventObj := RealTimeEvent{}
+	eventObj := realTimeEvent{}
 	err = json.Unmarshal(payload, &eventObj)
 	eventObj.Raw = payload
 	event = eventObj
@@ -48,20 +48,4 @@ func (c Connection) Receive() (event slack.RealTimeEvent, err error) {
 // Send a Slack RealTime event
 func (c Connection) Send(event slack.RealTimeEvent) (err error) {
 	return
-}
-
-// RealTimeEvent is a concrete implementation of slack.RealTimeEvent
-type RealTimeEvent struct {
-	EventType string `json:"type"`
-	Raw       []byte
-}
-
-// Type of the event
-func (r RealTimeEvent) Type() string {
-	return r.EventType
-}
-
-// Payload of the event
-func (r RealTimeEvent) Payload() []byte {
-	return r.Raw
 }
