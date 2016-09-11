@@ -16,7 +16,7 @@ type Dialer interface {
 
 // RealTimeEvent is an incoming RealTime payload
 type RealTimeEvent interface {
-	Type() string
+	EventType() string
 	Payload() []byte
 }
 

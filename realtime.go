@@ -28,23 +28,23 @@ func (g realTime) Receive() (event slack.RealTimeEvent, err error) {
 func (g realTime) PostMessage(channel, text string) (err error) {
 	id := nextID()
 	m := RealTimeMessage{
-		Type:    "message",
-		ID:      id,
-		Channel: channel,
-		User:    "",
-		Text:    text,
+		EventType: "message",
+		ID:        id,
+		Channel:   channel,
+		User:      "",
+		Text:      text,
 	}
 
-	return g.connection.Send(eventWrapper{m.Type, m})
+	return g.connection.Send(eventWrapper{m.EventType, m})
 }
 
 // Ping sends a ping request
 func (g realTime) Ping() (err error) {
 	id := nextID()
 	m := RealTimePing{
-		Type:      "ping",
+		EventType: "ping",
 		ID:        id,
 		Timestamp: time.Now(),
 	}
-	return g.connection.Send(eventWrapper{m.Type, m})
+	return g.connection.Send(eventWrapper{m.EventType, m})
 }

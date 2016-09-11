@@ -11,16 +11,16 @@ import (
 
 // New websocket dialer
 func New(client slack.WebClient) slack.Dialer {
-	return Dialer{client}
+	return dialer{client}
 }
 
 // Dialer creates websocket connections to Slack
-type Dialer struct {
+type dialer struct {
 	client slack.WebClient
 }
 
 // Dial a websocket
-func (d Dialer) Dial() (conn slack.RawConnection, err error) {
+func (d dialer) Dial() (conn slack.RawConnection, err error) {
 	wsurl, id, err := d.getWebsocketURL()
 	if err != nil {
 		return
@@ -31,7 +31,7 @@ func (d Dialer) Dial() (conn slack.RawConnection, err error) {
 		return
 	}
 
-	conn = Connection{
+	conn = connection{
 		websocket: ws,
 		id:        id,
 	}
@@ -39,7 +39,7 @@ func (d Dialer) Dial() (conn slack.RawConnection, err error) {
 }
 
 // getWebsocketURL via the Web API
-func (d Dialer) getWebsocketURL() (wsurl string, id string, err error) {
+func (d dialer) getWebsocketURL() (wsurl string, id string, err error) {
 	body, err := d.client.Get("rtm.start", nil)
 	if err != nil {
 		return

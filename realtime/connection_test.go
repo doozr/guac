@@ -53,8 +53,8 @@ func TestSuccessfulReceive(t *testing.T) {
 		t.Fatal("Unexpected error", err)
 	}
 
-	if result.Type() != "test" {
-		t.Fatal("Event types did not match", "test", result.Type())
+	if result.EventType() != "test" {
+		t.Fatal("Event types did not match", "test", result.EventType())
 	}
 
 	v := make(map[string]string)
@@ -113,8 +113,8 @@ func TestSuccessfulSend(t *testing.T) {
 	conn := New(raw)
 
 	event := realTimeEvent{
-		EventType: "test",
-		Raw: []byte(`{
+		eventType: "test",
+		payload: []byte(`{
 				"type": "test",
 				"body": "this is a test"
 			}`),
@@ -137,8 +137,8 @@ func TestSendError(t *testing.T) {
 	conn := New(raw)
 
 	event := realTimeEvent{
-		EventType: "test",
-		Raw:       nil,
+		eventType: "test",
+		payload:   nil,
 	}
 
 	err := conn.Send(event)

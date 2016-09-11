@@ -17,19 +17,19 @@ func (t apiResponse) Payload() []byte {
 }
 
 // Client of the Web API
-type Client struct {
+type client struct {
 	token string
 }
 
 // New web API client
-func New(token string) Client {
-	return Client{
+func New(token string) slack.WebClient {
+	return client{
 		token: token,
 	}
 }
 
 // Get an event from the API
-func (c Client) Get(endPoint string, values url.Values) (response slack.APIResponse, err error) {
+func (c client) Get(endPoint string, values url.Values) (response slack.APIResponse, err error) {
 	if values == nil {
 		values = url.Values{}
 	}
@@ -63,7 +63,7 @@ func (c Client) Get(endPoint string, values url.Values) (response slack.APIRespo
 }
 
 // Post an action request and return the response
-func (c Client) Post(endPoint string, values url.Values) (response slack.APIResponse, err error) {
+func (c client) Post(endPoint string, values url.Values) (response slack.APIResponse, err error) {
 	if values == nil {
 		values = url.Values{}
 	}

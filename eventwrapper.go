@@ -4,15 +4,15 @@ import "encoding/json"
 
 // Wrapper to make any event satisfy the slack.RealTimeEvent interface
 type eventWrapper struct {
-	EventType string
-	Event     interface{}
+	eventType string
+	event     interface{}
 }
 
-func (w eventWrapper) Type() string {
-	return w.EventType
+func (w eventWrapper) EventType() string {
+	return w.eventType
 }
 
 func (w eventWrapper) Payload() []byte {
-	payload, _ := json.Marshal(w.Event)
+	payload, _ := json.Marshal(w.event)
 	return payload
 }
