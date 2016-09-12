@@ -1,13 +1,18 @@
 package realtime
 
-// Event is an incoming RealTime payload
+// Event is the base interface to any Slack RealTime event
 type Event interface {
+	EventType() string
+}
+
+// RawEvent is a raw Slack RealTime event ready for receiving or sending
+type RawEvent interface {
 	EventType() string
 	Payload() []byte
 }
 
 // Connection is an active Slack RealTime API connection
 type Connection interface {
-	Send(Event) error
-	Receive() (Event, error)
+	Send(RawEvent) error
+	Receive() (RawEvent, error)
 }

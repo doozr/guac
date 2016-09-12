@@ -18,31 +18,43 @@ type RealTimeClient struct {
 	connection realtime.Connection
 }
 
-// Receive an event from the Slack RealTime API
-func (g RealTimeClient) Receive() (event realtime.Event, err error) {
-	return g.connection.Receive()
-}
-
 // PostMessage sends a chat message to the given channel
 func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 	id := nextID()
 	m := RealTimeMessage{
-		EventType: "message",
-		ID:        id,
-		Channel:   channel,
-		User:      "",
-		Text:      text,
+		ID:      id,
+		Channel: channel,
+		User:    "",
+		Text:    text,
 	}
 
-	return g.connection.Send(eventWrapper{m.EventType, m})
+	return g.connection.Send(eventWrapper{"message", m})
 }
 
 // Ping sends a ping request
 func (g RealTimeClient) Ping() (err error) {
 	id := nextID()
 	m := RealTimePing{
-		EventType: "ping",
-		ID:        id,
+		ID: id,
 	}
-	return g.connection.Send(eventWrapper{m.EventType, m})
+	return g.connection.Send(eventWrapper{"ping", m})
+}
+
+// Receive an event from the Slack RealTime API
+func (g RealTimeClient) Receive() (event interface{}, err error) {
+	var raw realtime.RawEvent
+	for {
+		// Bail out on error immediately
+		raw, err = g.connection.Receive()
+		if err != nil {
+			break
+		}
+
+		// Only return if there is something worth returning, or an error
+		event, err = convertEvent(raw)
+		if event != nil || err != nil {
+			break
+		}
+	}
+	return
 }

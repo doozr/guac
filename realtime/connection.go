@@ -20,7 +20,7 @@ func New(raw websocket.Connection) (conn Connection) {
 }
 
 // Receive a Slack RealTimeEvent
-func (c connection) Receive() (event Event, err error) {
+func (c connection) Receive() (event RawEvent, err error) {
 	payload, err := c.raw.Receive()
 	if err != nil {
 		return
@@ -38,7 +38,7 @@ func (c connection) Receive() (event Event, err error) {
 }
 
 // Send a Slack RealTime event
-func (c connection) Send(event Event) (err error) {
+func (c connection) Send(event RawEvent) (err error) {
 	err = c.raw.Send(event.Payload())
 	return
 }

@@ -10,15 +10,15 @@ import (
 )
 
 type TestRealTimeConnection struct {
-	receive func() (realtime.Event, error)
-	send    func(realtime.Event) error
+	receive func() (realtime.RawEvent, error)
+	send    func(realtime.RawEvent) error
 }
 
-func (c TestRealTimeConnection) Send(event realtime.Event) error {
+func (c TestRealTimeConnection) Send(event realtime.RawEvent) error {
 	return c.send(event)
 }
 
-func (c TestRealTimeConnection) Receive() (realtime.Event, error) {
+func (c TestRealTimeConnection) Receive() (realtime.RawEvent, error) {
 	return c.receive()
 }
 
@@ -35,18 +35,18 @@ func (e TestRealTimeEvent) Payload() []byte {
 	return e.payload
 }
 
-func TestSuccessfulReceive(t *testing.T) {
-	payload := []byte(`this is a test payload`)
+func receiveEvent(t *testing.T, eventType string, payload string, expected interface{}) {
+	bytes := []byte(payload)
 	called := false
 	realTimeConnection := TestRealTimeConnection{
-		receive: func() (realtime.Event, error) {
+		receive: func() (realtime.RawEvent, error) {
 			if called {
 				t.Fatal("RealTimeConnection.Receive called more than once")
 			}
 			called = true
 			return TestRealTimeEvent{
-				eventType: "test",
-				payload:   payload,
+				eventType: eventType,
+				payload:   bytes,
 			}, nil
 		},
 	}
@@ -54,23 +54,94 @@ func TestSuccessfulReceive(t *testing.T) {
 	realTime := RealTimeClient{realTimeConnection}
 
 	event, err := realTime.Receive()
-
 	if err != nil {
 		t.Fatal("Unexpected error", err)
 	}
 
-	if event.EventType() != "test" {
-		t.Fatal("Event type does not match", "test", event.EventType())
+	if !reflect.DeepEqual(expected, event) {
+		t.Fatal("Event did not match", expected, event)
+	}
+}
+
+func TestReceivePing(t *testing.T) {
+	receiveEvent(t, "ping",
+		`{
+			"type": "ping",
+			"id": 1234
+		}`,
+		RealTimePing{
+			Type: "ping",
+			ID:   1234,
+		})
+}
+
+func TestReceiveMessage(t *testing.T) {
+	receiveEvent(t, "message",
+		`{
+			"type": "message",
+			"id": 1234,
+			"channel": "C9876543",
+			"user": "U1234567",
+			"text": "this is the text"
+		}`,
+		RealTimeMessage{
+			Type:    "message",
+			ID:      1234,
+			Channel: "C9876543",
+			User:    "U1234567",
+			Text:    "this is the text",
+		})
+}
+
+func TestReceiveUserChance(t *testing.T) {
+	receiveEvent(t, "user_change",
+		`{
+			"type": "user_change",
+			"user": {
+				"id": "U1234567",
+				"name": "Mr Test"
+			}
+		}`,
+		RealTimeUserChange{
+			Type: "user_change",
+			User: UserInfo{
+				ID:   "U1234567",
+				Name: "Mr Test",
+			},
+		})
+}
+
+func TestDoesNotReturnUnknown(t *testing.T) {
+	type eventFn func() (string, []byte)
+	incoming := make(chan eventFn, 2)
+	incoming <- func() (string, []byte) { return "unknown", []byte(`{ "type": "uknown", "field": "value" }`) }
+	incoming <- func() (string, []byte) { return "ping", []byte(`{ "type": "ping", "id": 1234 }`) }
+	realTimeConnection := TestRealTimeConnection{
+		receive: func() (realtime.RawEvent, error) {
+			fn := <-incoming
+			eventType, bytes := fn()
+			return TestRealTimeEvent{
+				eventType: eventType,
+				payload:   bytes,
+			}, nil
+		},
 	}
 
-	if !reflect.DeepEqual(event.Payload(), payload) {
-		t.Fatal("Payload does not match", payload, event.Payload())
+	realTime := RealTimeClient{realTimeConnection}
+
+	event, err := realTime.Receive()
+	if err != nil {
+		t.Fatal("Unexpected error", err)
+	}
+
+	if _, ok := event.(RealTimePing); !ok {
+		t.Fatal("Expected RealTimePing instance", event)
 	}
 }
 
 func TestReceiveError(t *testing.T) {
 	realTimeConnection := TestRealTimeConnection{
-		receive: func() (realtime.Event, error) {
+		receive: func() (realtime.RawEvent, error) {
 			return nil, fmt.Errorf("Receive error")
 		},
 	}
@@ -89,9 +160,9 @@ func TestReceiveError(t *testing.T) {
 }
 
 func TestPing(t *testing.T) {
-	var event realtime.Event
+	var event realtime.RawEvent
 	realTimeConnection := TestRealTimeConnection{
-		send: func(e realtime.Event) error {
+		send: func(e realtime.RawEvent) error {
 			if event != nil {
 				t.Fatal("realTimeConnection.Send called more than once")
 			}
@@ -122,10 +193,6 @@ func TestPing(t *testing.T) {
 		t.Fatal("Unexpected error", err)
 	}
 
-	if ping.EventType != "ping" {
-		t.Fatal("Payload type should be `ping`", ping.EventType)
-	}
-
 	if ping.ID <= 0 {
 		t.Fatal("ID should be > 0")
 	}
@@ -133,7 +200,7 @@ func TestPing(t *testing.T) {
 
 func TestPingError(t *testing.T) {
 	realTimeConnection := TestRealTimeConnection{
-		send: func(e realtime.Event) error {
+		send: func(e realtime.RawEvent) error {
 			return fmt.Errorf("Ping error")
 		},
 	}
@@ -147,9 +214,9 @@ func TestPingError(t *testing.T) {
 }
 
 func TestPostMessage(t *testing.T) {
-	var event realtime.Event
+	var event realtime.RawEvent
 	realTimeConnection := TestRealTimeConnection{
-		send: func(e realtime.Event) error {
+		send: func(e realtime.RawEvent) error {
 			if event != nil {
 				t.Fatal("realTimeConnection.Send called more than once")
 			}
@@ -182,10 +249,6 @@ func TestPostMessage(t *testing.T) {
 		t.Fatal("Unexpected error", err)
 	}
 
-	if message.EventType != "message" {
-		t.Fatal("Payload type should be `message`", message.EventType)
-	}
-
 	if message.ID <= 0 {
 		t.Fatal("ID should be > 0")
 	}
@@ -205,7 +268,7 @@ func TestPostMessage(t *testing.T) {
 
 func TestPostMessageError(t *testing.T) {
 	realTimeConnection := TestRealTimeConnection{
-		send: func(e realtime.Event) error {
+		send: func(e realtime.RawEvent) error {
 			return fmt.Errorf("PostMessage error")
 		},
 	}
