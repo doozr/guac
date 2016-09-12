@@ -1,7 +1,5 @@
 package guac
 
-import "time"
-
 // RealTimeMessage is a chat message sent to a user or channel
 type RealTimeMessage struct {
 	EventType string `json:"type"`
@@ -15,5 +13,4 @@ type RealTimeMessage struct {
 type RealTimePing struct {
 	EventType string `json:"type"`
 	ID        uint64 `json:"id"`
-	Timestamp time.Time
 }

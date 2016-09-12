@@ -2,12 +2,12 @@ package guac
 
 import (
 	"github.com/doozr/guac/realtime"
-	"github.com/doozr/guac/slack"
+	"github.com/doozr/guac/web"
 	"github.com/doozr/guac/websocket"
 )
 
 type guac struct {
-	client slack.WebClient
+	client web.Client
 }
 
 func (g guac) RealTime() (conn RealTime, err error) {

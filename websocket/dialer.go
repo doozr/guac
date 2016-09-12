@@ -4,23 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"golang.org/x/net/websocket"
+	"github.com/doozr/guac/web"
 
-	"github.com/doozr/guac/slack"
+	"golang.org/x/net/websocket"
 )
 
 // New websocket dialer
-func New(client slack.WebClient) slack.Dialer {
+func New(client web.Client) Dialer {
 	return dialer{client}
 }
 
 // Dialer creates websocket connections to Slack
 type dialer struct {
-	client slack.WebClient
+	client web.Client
 }
 
 // Dial a websocket
-func (d dialer) Dial() (conn slack.RawConnection, err error) {
+func (d dialer) Dial() (conn Connection, err error) {
 	wsurl, id, err := d.getWebsocketURL()
 	if err != nil {
 		return

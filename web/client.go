@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-
-	"github.com/doozr/guac/slack"
 )
 
 // Payload of the response
@@ -22,14 +20,14 @@ type client struct {
 }
 
 // New web API client
-func New(token string) slack.WebClient {
+func New(token string) Client {
 	return client{
 		token: token,
 	}
 }
 
 // Get an event from the API
-func (c client) Get(endPoint string, values url.Values) (response slack.APIResponse, err error) {
+func (c client) Get(endPoint string, values url.Values) (response Response, err error) {
 	if values == nil {
 		values = url.Values{}
 	}
@@ -63,7 +61,7 @@ func (c client) Get(endPoint string, values url.Values) (response slack.APIRespo
 }
 
 // Post an action request and return the response
-func (c client) Post(endPoint string, values url.Values) (response slack.APIResponse, err error) {
+func (c client) Post(endPoint string, values url.Values) (response Response, err error) {
 	if values == nil {
 		values = url.Values{}
 	}

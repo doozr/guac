@@ -2,12 +2,11 @@ package guac
 
 import (
 	"sync/atomic"
-	"time"
 
-	"github.com/doozr/guac/slack"
+	"github.com/doozr/guac/realtime"
 )
 
-var counter uint64
+var counter uint64 = 1
 
 // Get the next ID for this run
 func nextID() uint64 {
@@ -16,11 +15,11 @@ func nextID() uint64 {
 
 // realTime is a concrete implementation of guac.RealTime
 type realTime struct {
-	connection slack.RealTimeConnection
+	connection realtime.Connection
 }
 
 // Receive an event from the slack RTM API
-func (g realTime) Receive() (event slack.RealTimeEvent, err error) {
+func (g realTime) Receive() (event realtime.Event, err error) {
 	return g.connection.Receive()
 }
 
@@ -44,7 +43,6 @@ func (g realTime) Ping() (err error) {
 	m := RealTimePing{
 		EventType: "ping",
 		ID:        id,
-		Timestamp: time.Now(),
 	}
 	return g.connection.Send(eventWrapper{m.EventType, m})
 }

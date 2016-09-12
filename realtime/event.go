@@ -2,7 +2,7 @@ package realtime
 
 import "encoding/json"
 
-// realTimeEvent is a concrete implementation of slack.RealTimeEvent
+// realTimeEvent is a concrete implementation of Event
 type realTimeEvent struct {
 	eventType string
 	payload   []byte

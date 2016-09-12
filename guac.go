@@ -1,7 +1,7 @@
 package guac
 
 import (
-	"github.com/doozr/guac/slack"
+	"github.com/doozr/guac/realtime"
 	"github.com/doozr/guac/web"
 )
 
@@ -12,7 +12,7 @@ type Guac interface {
 
 // RealTime interface to Slack RealTime
 type RealTime interface {
-	Receive() (slack.RealTimeEvent, error)
+	Receive() (realtime.Event, error)
 	PostMessage(channel, text string) error
 	Ping() error
 }

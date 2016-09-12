@@ -3,16 +3,16 @@ package realtime
 import (
 	"encoding/json"
 
-	"github.com/doozr/guac/slack"
+	"github.com/doozr/guac/websocket"
 )
 
 // Connection represents an open Slack RealTime connection
 type connection struct {
-	raw slack.RawConnection
+	raw websocket.Connection
 }
 
 // New to the Slack RealTime API
-func New(raw slack.RawConnection) (conn slack.RealTimeConnection) {
+func New(raw websocket.Connection) (conn Connection) {
 	conn = &connection{
 		raw: raw,
 	}
@@ -20,7 +20,7 @@ func New(raw slack.RawConnection) (conn slack.RealTimeConnection) {
 }
 
 // Receive a Slack RealTimeEvent
-func (c connection) Receive() (event slack.RealTimeEvent, err error) {
+func (c connection) Receive() (event Event, err error) {
 	payload, err := c.raw.Receive()
 	if err != nil {
 		return
@@ -38,7 +38,7 @@ func (c connection) Receive() (event slack.RealTimeEvent, err error) {
 }
 
 // Send a Slack RealTime event
-func (c connection) Send(event slack.RealTimeEvent) (err error) {
+func (c connection) Send(event Event) (err error) {
 	err = c.raw.Send(event.Payload())
 	return
 }

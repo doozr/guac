@@ -2,7 +2,7 @@ package web
 
 import "fmt"
 
-// apiResponse is a concrete implementation of slack.APIResponse
+// apiResponse is a concrete implementation of web.APIResponse
 type apiResponse struct {
 	OK  bool   `json:"ok"`
 	Err string `json:"error"`

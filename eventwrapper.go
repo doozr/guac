@@ -2,7 +2,7 @@ package guac
 
 import "encoding/json"
 
-// Wrapper to make any event satisfy the slack.RealTimeEvent interface
+// Wrapper to make any event satisfy the realtime.Event interface
 type eventWrapper struct {
 	eventType string
 	event     interface{}
