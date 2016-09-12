@@ -6,18 +6,20 @@ import (
 	"github.com/doozr/guac/websocket"
 )
 
-type guac struct {
+// WebClient is an interface to the Slack Web API
+type WebClient struct {
 	client web.Client
 }
 
-func (g guac) RealTime() (conn RealTime, err error) {
+// RealTime connects to the Slack RealTime API using the Web client's credentials
+func (g WebClient) RealTime() (client RealTimeClient, err error) {
 	raw, err := websocket.New(g.client).Dial()
 	if err != nil {
 		return
 	}
 
 	realTimeConn := realtime.New(raw)
-	conn = realTime{
+	client = RealTimeClient{
 		connection: realTimeConn,
 	}
 	return

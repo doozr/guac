@@ -51,7 +51,7 @@ func TestSuccessfulReceive(t *testing.T) {
 		},
 	}
 
-	realTime := realTime{realTimeConnection}
+	realTime := RealTimeClient{realTimeConnection}
 
 	event, err := realTime.Receive()
 
@@ -75,7 +75,7 @@ func TestReceiveError(t *testing.T) {
 		},
 	}
 
-	rtm := realTime{realTimeConnection}
+	rtm := RealTimeClient{realTimeConnection}
 
 	event, err := rtm.Receive()
 
@@ -100,7 +100,7 @@ func TestPing(t *testing.T) {
 		},
 	}
 
-	rtm := realTime{realTimeConnection}
+	rtm := RealTimeClient{realTimeConnection}
 
 	err := rtm.Ping()
 	if err != nil {
@@ -138,7 +138,7 @@ func TestPingError(t *testing.T) {
 		},
 	}
 
-	rtm := realTime{realTimeConnection}
+	rtm := RealTimeClient{realTimeConnection}
 
 	err := rtm.Ping()
 	if err == nil {
@@ -158,7 +158,7 @@ func TestPostMessage(t *testing.T) {
 		},
 	}
 
-	rtm := realTime{realTimeConnection}
+	rtm := RealTimeClient{realTimeConnection}
 
 	channel := "#F00DD00D"
 	text := "this is the message"
@@ -210,7 +210,7 @@ func TestPostMessageError(t *testing.T) {
 		},
 	}
 
-	rtm := realTime{realTimeConnection}
+	rtm := RealTimeClient{realTimeConnection}
 
 	channel := "#F00DD00D"
 	text := "this is the message"
