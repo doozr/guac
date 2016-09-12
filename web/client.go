@@ -9,11 +9,6 @@ import (
 	"net/url"
 )
 
-// Payload of the response
-func (t apiResponse) Payload() []byte {
-	return t.Raw
-}
-
 // Client of the Web API
 type client struct {
 	token string

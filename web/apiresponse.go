@@ -21,3 +21,8 @@ func (t apiResponse) Error() (err error) {
 	}
 	return
 }
+
+// Payload returns the raw JSON payload
+func (t apiResponse) Payload() []byte {
+	return t.Raw
+}
