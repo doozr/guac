@@ -8,8 +8,8 @@ import (
 )
 
 type TestRawConnection struct {
-	Incoming chan []byte
-	Outgoing chan []byte
+	receive func() ([]byte, error)
+	send    func([]byte) error
 }
 
 func (c TestRawConnection) ID() string {
@@ -17,36 +17,25 @@ func (c TestRawConnection) ID() string {
 }
 
 func (c TestRawConnection) Receive() (payload []byte, err error) {
-	v := <-c.Incoming
-	if v == nil {
-		return nil, fmt.Errorf("Incoming Error")
-	}
-	return v, nil
+	return c.receive()
 }
 
 func (c TestRawConnection) Send(payload []byte) (err error) {
-	if payload == nil {
-		return fmt.Errorf("Outgoing Error")
-	}
-	c.Outgoing <- payload
-	return
-}
-
-func NewTestRawConnection(inBuffer, outBuffer int) TestRawConnection {
-	return TestRawConnection{
-		Incoming: make(chan []byte, inBuffer),
-		Outgoing: make(chan []byte, outBuffer),
-	}
+	return c.send(payload)
 }
 
 func TestSuccessfulReceive(t *testing.T) {
-	raw := NewTestRawConnection(1, 0)
+	called := false
+	raw := TestRawConnection{
+		receive: func() ([]byte, error) {
+			if called {
+				t.Fatal("RawConnection.Receive called more than once")
+			}
+			called = true
+			return []byte(`{ "type": "test", "body": "this is a test" }`), nil
+		},
+	}
 	conn := New(raw)
-
-	raw.Incoming <- []byte(`{
-			"type": "test",
-			"body": "this is a test"
-		}`)
 
 	result, err := conn.Receive()
 	if err != nil {
@@ -74,13 +63,17 @@ func TestSuccessfulReceive(t *testing.T) {
 }
 
 func TestInvalidJson(t *testing.T) {
-	raw := NewTestRawConnection(1, 0)
+	called := false
+	raw := TestRawConnection{
+		receive: func() ([]byte, error) {
+			if called {
+				t.Fatal("RawConnection.Receive called more than once")
+			}
+			called = true
+			return []byte(`{ "type": "test", INVALID JSON }`), nil
+		},
+	}
 	conn := New(raw)
-
-	raw.Incoming <- []byte(`{
-			"type": "test",
-			INVALID JSON
-		}`)
 
 	result, err := conn.Receive()
 	if result != nil {
@@ -93,10 +86,12 @@ func TestInvalidJson(t *testing.T) {
 }
 
 func TestReceiveError(t *testing.T) {
-	raw := NewTestRawConnection(0, 0)
+	raw := TestRawConnection{
+		receive: func() ([]byte, error) {
+			return nil, fmt.Errorf("Receive error")
+		},
+	}
 	conn := New(raw)
-
-	close(raw.Incoming)
 
 	result, err := conn.Receive()
 	if result != nil {
@@ -109,7 +104,16 @@ func TestReceiveError(t *testing.T) {
 }
 
 func TestSuccessfulSend(t *testing.T) {
-	raw := NewTestRawConnection(0, 1)
+	var payload []byte
+	raw := TestRawConnection{
+		send: func(p []byte) error {
+			if payload != nil {
+				t.Fatal("RawConnection.Send called more than once")
+			}
+			payload = p
+			return nil
+		},
+	}
 	conn := New(raw)
 
 	event := realTimeEvent{
@@ -125,15 +129,17 @@ func TestSuccessfulSend(t *testing.T) {
 		t.Fatal("Unexpected error", err)
 	}
 
-	payload := <-raw.Outgoing
-
 	if !reflect.DeepEqual(payload, event.Payload()) {
 		t.Fatal("Payload did not match", event.Payload(), payload)
 	}
 }
 
 func TestSendError(t *testing.T) {
-	raw := NewTestRawConnection(0, 1)
+	raw := TestRawConnection{
+		send: func(p []byte) error {
+			return fmt.Errorf("Outgoing error")
+		},
+	}
 	conn := New(raw)
 
 	event := realTimeEvent{
