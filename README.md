@@ -44,7 +44,6 @@ could call handlers, push the events onto channels, or anything else.
 ```go
 
 func receiveEvents(rtm slack.RealTimeClient,
-
                    done chan bool,
                    messages chan MessageEvent,
                    userChanges chan UserChangeEvent) {
