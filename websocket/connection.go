@@ -6,6 +6,7 @@ import "golang.org/x/net/websocket"
 type connection struct {
 	id        string
 	websocket *websocket.Conn
+	err       error
 }
 
 // Close terminates the web socket.
@@ -20,13 +21,27 @@ func (c connection) ID() string {
 
 // Send a payload over the websocket.
 func (c connection) Send(payload []byte) (err error) {
+	if c.err != nil {
+		return c.err
+	}
+
 	// Force it to be a TextFrame by wrapping in string
 	err = websocket.Message.Send(c.websocket, string(payload))
+	if err != nil {
+		c.err = err
+	}
 	return
 }
 
 // Receive a payload from the websocket.
 func (c connection) Receive() (payload []byte, err error) {
+	if c.err != nil {
+		return nil, c.err
+	}
+
 	err = websocket.Message.Receive(c.websocket, &payload)
+	if err != nil {
+		c.err = err
+	}
 	return
 }
