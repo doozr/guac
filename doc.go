@@ -10,6 +10,7 @@ required.
 ```go
 
 slack := guac.New(token)
+
 ```
 
 Connecting to the Real Time API is done via an existing web client and opens a
@@ -18,6 +19,7 @@ websocket to communicate with the Slack service.
 ```go
 
 rtm := slack.RealTime()
+
 ```
 
 Receive events via the `RealTime.Receive` method. All events are returned from
@@ -50,6 +52,7 @@ func receiveEvents(rtm slack.RealTimeClient,
         }
     }
 }
+
 ```
 
 */
