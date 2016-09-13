@@ -1,0 +1,13 @@
+# {{ .Name }}
+
+Install:
+
+    go get {{ .ImportPath}}
+
+And use:
+
+    import "{{ .ImportPath }}"
+
+{{ .EmitSynopsis }}
+
+{{ .EmitUsage }}
