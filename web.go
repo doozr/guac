@@ -16,6 +16,9 @@ type WebClient struct {
 }
 
 // RealTime connects to the Slack RealTime API using the Web client's credentials.
+//
+// The returned object represents a websocket connection that remains open
+// between calls until the Close method is called.
 func (c WebClient) RealTime() (client RealTimeClient, err error) {
 	raw, err := websocket.New(c.client).Dial()
 	if err != nil {
@@ -30,6 +33,8 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 }
 
 // UsersList returns a list of user information.
+//
+// All users are returned, including deleted and deactivated users.
 func (c WebClient) UsersList() (users []UserInfo, err error) {
 	response, err := c.client.Get("users.list", nil)
 	if err != nil {
@@ -55,6 +60,9 @@ func (c WebClient) UsersList() (users []UserInfo, err error) {
 }
 
 // ChannelsList gets a list of channel information.
+//
+// All channels, including archived channels, are returned excluding private
+// channels. Use GroupsList to retrieve private channels.
 func (c WebClient) ChannelsList() (channels []ChannelInfo, err error) {
 	response, err := c.client.Get("channels.list", nil)
 	if err != nil {
@@ -80,7 +88,8 @@ func (c WebClient) ChannelsList() (channels []ChannelInfo, err error) {
 }
 
 // GroupsList gets a list of private channel information.
-// Slack's nomenclature for different types of channel is weird.
+//
+// All private channels, but not single or multi-user IMs.
 func (c WebClient) GroupsList() (channels []ChannelInfo, err error) {
 	response, err := c.client.Get("groups.list", nil)
 	if err != nil {
@@ -106,6 +115,9 @@ func (c WebClient) GroupsList() (channels []ChannelInfo, err error) {
 }
 
 // IMOpen opens or returns an IM channel with a specified user.
+//
+// If an IM with the specified user already exists and is not archived it is
+// returned, otherwise a new IM channel is opened with that user.
 func (c WebClient) IMOpen(user string) (channel string, err error) {
 	values := url.Values{}
 	values.Add("user", user)

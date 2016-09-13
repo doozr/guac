@@ -119,6 +119,12 @@ type RealTimeClient struct {
 
 RealTimeClient is a client of the Slack RealTime API.
 
+The connection stays open between calls until Close is called. If an error is
+returned at any point, it should be considered fatal for the connection and a
+new connection should be opened with WebClient.RealTime.
+
+Subsequent calls after an error will result in the same error.
+
 #### func (RealTimeClient) Close
 
 ```go
@@ -133,6 +139,8 @@ func (g RealTimeClient) Ping() (err error)
 ```
 Ping sends a ping request.
 
+Sends a bare ping with no additional information.
+
 #### func (RealTimeClient) PostMessage
 
 ```go
@@ -140,12 +148,19 @@ func (g RealTimeClient) PostMessage(channel, text string) (err error)
 ```
 PostMessage sends a chat message to the given channel.
 
+The message is posted as the bot itself, and does not try to take on the
+identity of a user. Use the API formatting standard.
+
 #### func (RealTimeClient) Receive
 
 ```go
 func (g RealTimeClient) Receive() (event interface{}, err error)
 ```
 Receive an event from the Slack RealTime API.
+
+Receive one of the concrete event types and return it. The event should be
+checked with a type assertion to determine its type. If a message of an as-yet
+unsupported type arrives it will be ignored.
 
 #### type UserChangeEvent
 
@@ -193,13 +208,17 @@ func (c WebClient) ChannelsList() (channels []ChannelInfo, err error)
 ```
 ChannelsList gets a list of channel information.
 
+All channels, including archived channels, are returned excluding private
+channels. Use GroupsList to retrieve private channels.
+
 #### func (WebClient) GroupsList
 
 ```go
 func (c WebClient) GroupsList() (channels []ChannelInfo, err error)
 ```
-GroupsList gets a list of private channel information. Slack's nomenclature for
-different types of channel is weird.
+GroupsList gets a list of private channel information.
+
+All private channels, but not single or multi-user IMs.
 
 #### func (WebClient) IMOpen
 
@@ -208,6 +227,9 @@ func (c WebClient) IMOpen(user string) (channel string, err error)
 ```
 IMOpen opens or returns an IM channel with a specified user.
 
+If an IM with the specified user already exists and is not archived it is
+returned, otherwise a new IM channel is opened with that user.
+
 #### func (WebClient) RealTime
 
 ```go
@@ -215,9 +237,14 @@ func (c WebClient) RealTime() (client RealTimeClient, err error)
 ```
 RealTime connects to the Slack RealTime API using the Web client's credentials.
 
+The returned object represents a websocket connection that remains open between
+calls until the Close method is called.
+
 #### func (WebClient) UsersList
 
 ```go
 func (c WebClient) UsersList() (users []UserInfo, err error)
 ```
 UsersList returns a list of user information.
+
+All users are returned, including deleted and deactivated users.
