@@ -1,6 +1,6 @@
 package websocket
 
-// Connection sends and receives byte arrays to the Slack RealTime API
+// Connection sends and receives byte arrays to the Slack RealTime API.
 type Connection interface {
 	Close()
 	ID() string
@@ -8,7 +8,7 @@ type Connection interface {
 	Receive() ([]byte, error)
 }
 
-// Dialer makes raw connections to the Slack RealTime API
+// Dialer makes raw connections to the Slack RealTime API.
 type Dialer interface {
 	Dial() (Connection, error)
 }

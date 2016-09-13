@@ -9,17 +9,17 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-// New websocket dialer
+// New websocket Dialer.
 func New(client web.Client) Dialer {
 	return dialer{client}
 }
 
-// Dialer creates websocket connections to Slack
+// Dialer creates websocket connections to Slack.
 type dialer struct {
 	client web.Client
 }
 
-// Dial a websocket
+// Dial a websocket.
 func (d dialer) Dial() (conn Connection, err error) {
 	wsurl, id, err := d.getWebsocketURL()
 	if err != nil {
@@ -38,7 +38,7 @@ func (d dialer) Dial() (conn Connection, err error) {
 	return
 }
 
-// getWebsocketURL via the Web API
+// getWebsocketURL gets the socket URL via the Web API.
 func (d dialer) getWebsocketURL() (wsurl string, id string, err error) {
 	body, err := d.client.Get("rtm.start", nil)
 	if err != nil {

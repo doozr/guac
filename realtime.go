@@ -8,25 +8,25 @@ import (
 
 var counter uint64
 
-// Get the next ID for this run
+// nextID returns the next message ID for this run.
 func nextID() uint64 {
 	return atomic.AddUint64(&counter, 1)
 }
 
-// RealTimeClient is a client of the Slack RealTime API
+// RealTimeClient is a client of the Slack RealTime API.
 type RealTimeClient struct {
 	connection realtime.Connection
 }
 
-// Close terminates the connection
+// Close terminates the connection.
 func (g RealTimeClient) Close() {
 	g.connection.Close()
 }
 
-// PostMessage sends a chat message to the given channel
+// PostMessage sends a chat message to the given channel.
 func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 	id := nextID()
-	m := RealTimeMessage{
+	m := MessageEvent{
 		Type:    "message",
 		ID:      id,
 		Channel: channel,
@@ -37,17 +37,17 @@ func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 	return g.connection.Send(eventWrapper{"message", m})
 }
 
-// Ping sends a ping request
+// Ping sends a ping request.
 func (g RealTimeClient) Ping() (err error) {
 	id := nextID()
-	m := RealTimePingPong{
+	m := PingPongEvent{
 		Type: "ping",
 		ID:   id,
 	}
 	return g.connection.Send(eventWrapper{"ping", m})
 }
 
-// Receive an event from the Slack RealTime API
+// Receive an event from the Slack RealTime API.
 func (g RealTimeClient) Receive() (event interface{}, err error) {
 	var raw realtime.RawEvent
 	for {

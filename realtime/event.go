@@ -2,13 +2,13 @@ package realtime
 
 import "encoding/json"
 
-// realTimeEvent is a concrete implementation of Event
+// realTimeEvent is a concrete implementation of Event.
 type realTimeEvent struct {
 	eventType string
 	payload   []byte
 }
 
-// UnmarshalJSON reads the type from the JSON and stores the raw payload
+// UnmarshalJSON reads the type from the JSON and stores the raw payload.
 func (r *realTimeEvent) UnmarshalJSON(payload []byte) (err error) {
 	r.payload = payload
 
@@ -29,18 +29,18 @@ func (r *realTimeEvent) UnmarshalJSON(payload []byte) (err error) {
 	return
 }
 
-// MarshalJSON returns the raw JSON representation of the event
+// MarshalJSON returns the raw JSON representation of the event.
 func (r *realTimeEvent) MarshalJSON() (payload []byte, err error) {
 	payload = r.payload
 	return
 }
 
-// Type of the event
+// Type of the event.
 func (r realTimeEvent) EventType() string {
 	return r.eventType
 }
 
-// Payload of the event
+// Payload of the event.
 func (r realTimeEvent) Payload() []byte {
 	return r.payload
 }

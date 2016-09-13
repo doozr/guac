@@ -18,12 +18,47 @@ the *Custom Integrations* section of the Slack admin panel. Bots can discover
 their own name and channels via the API itself so none of that information is
 required.
 
-    slack := guac.New(token)
+``` go
+
+slack := guac.New(token) ```
 
 Connecting to the Real Time API is done via an existing web client and opens a
 websocket to communicate with the Slack service.
 
-    rtm := slack.RealTime()
+``` go
+
+rtm := slack.RealTime() ```
+
+Receive events via the `RealTime.Receive` method. All events are returned from
+the same function so the best way to handle them is with a type switch. this
+could call handlers, push the events onto channels, or anything else.
+
+``` go func receiveEvents(rtm slack.RealTimeClient,
+
+                   done chan bool,
+                   messages chan MessageEvent,
+                   userChanges chan UserChangeEvent) {
+    for {
+        select {
+        case <-done:
+            return
+        default:
+            e, err := rtm.Receive()
+            if err != nil {
+                return err
+            }
+
+            switch event := e.(type) {
+            case MessageEvent:
+                messages <- event
+            case UserChangeEvent:
+                userChanges <- event
+            default:
+                // Unhandled
+        }
+    }
+
+} ```
 
 ## Usage
 
@@ -37,42 +72,12 @@ type ChannelInfo struct {
 }
 ```
 
-ChannelInfo represents a channel or group's info
+ChannelInfo represents a channel or group's info.
 
-#### type RealTimeClient
-
-```go
-type RealTimeClient struct {
-}
-```
-
-RealTimeClient is a client of the Slack RealTime API
-
-#### func (RealTimeClient) Ping
+#### type MessageEvent
 
 ```go
-func (g RealTimeClient) Ping() (err error)
-```
-Ping sends a ping request
-
-#### func (RealTimeClient) PostMessage
-
-```go
-func (g RealTimeClient) PostMessage(channel, text string) (err error)
-```
-PostMessage sends a chat message to the given channel
-
-#### func (RealTimeClient) Receive
-
-```go
-func (g RealTimeClient) Receive() (event interface{}, err error)
-```
-Receive an event from the Slack RealTime API
-
-#### type RealTimeMessage
-
-```go
-type RealTimeMessage struct {
+type MessageEvent struct {
 	Type    string `json:"type"`
 	ID      uint64 `json:"id"`
 	Channel string `json:"channel"`
@@ -81,30 +86,67 @@ type RealTimeMessage struct {
 }
 ```
 
-RealTimeMessage is a chat message sent to a user or channel
+MessageEvent is a chat message sent to a user or channel.
 
-#### type RealTimePing
+#### type PingPongEvent
 
 ```go
-type RealTimePing struct {
+type PingPongEvent struct {
 	Type string `json:"type"`
 	ID   uint64 `json:"id"`
 }
 ```
 
-RealTimePing is a ping and also the reciprocal pong
+PingPongEvent is a ping and also the reciprocal pong.
 
-#### type RealTimeUserChange
+#### type RealTimeClient
 
 ```go
-type RealTimeUserChange struct {
-	Type string   `json:"type"`
-	User UserInfo `json:"user"`
+type RealTimeClient struct {
 }
 ```
 
-RealTimeUserChange is a notification that something about a user has changed
-Currently only username changes are supported
+RealTimeClient is a client of the Slack RealTime API.
+
+#### func (RealTimeClient) Close
+
+```go
+func (g RealTimeClient) Close()
+```
+Close terminates the connection.
+
+#### func (RealTimeClient) Ping
+
+```go
+func (g RealTimeClient) Ping() (err error)
+```
+Ping sends a ping request.
+
+#### func (RealTimeClient) PostMessage
+
+```go
+func (g RealTimeClient) PostMessage(channel, text string) (err error)
+```
+PostMessage sends a chat message to the given channel.
+
+#### func (RealTimeClient) Receive
+
+```go
+func (g RealTimeClient) Receive() (event interface{}, err error)
+```
+Receive an event from the Slack RealTime API.
+
+#### type UserChangeEvent
+
+```go
+type UserChangeEvent struct {
+	Type     string `json:"type"`
+	UserInfo `json:"user"`
+}
+```
+
+UserChangeEvent is a notification that something about a user has changed.
+Currently only username changes are supported.
 
 #### type UserInfo
 
@@ -115,7 +157,7 @@ type UserInfo struct {
 }
 ```
 
-UserInfo represents a single user's profile info
+UserInfo represents a single user's profile info.
 
 #### type WebClient
 
@@ -124,47 +166,47 @@ type WebClient struct {
 }
 ```
 
-WebClient is an interface to the Slack Web API
+WebClient is an interface to the Slack Web API.
 
 #### func  New
 
 ```go
 func New(token string) WebClient
 ```
-New Slack Web API client
+New Slack Web API client.
 
 #### func (WebClient) ChannelsList
 
 ```go
 func (c WebClient) ChannelsList() (channels []ChannelInfo, err error)
 ```
-ChannelsList gets a list of channel information
+ChannelsList gets a list of channel information.
 
 #### func (WebClient) GroupsList
 
 ```go
 func (c WebClient) GroupsList() (channels []ChannelInfo, err error)
 ```
-GroupsList gets a list of private channel information Slack's nomenclature for
-different types of channel is weird
+GroupsList gets a list of private channel information. Slack's nomenclature for
+different types of channel is weird.
 
 #### func (WebClient) IMOpen
 
 ```go
 func (c WebClient) IMOpen(user string) (channel string, err error)
 ```
-IMOpen opens or returns an IM channel with a specified user
+IMOpen opens or returns an IM channel with a specified user.
 
 #### func (WebClient) RealTime
 
 ```go
 func (c WebClient) RealTime() (client RealTimeClient, err error)
 ```
-RealTime connects to the Slack RealTime API using the Web client's credentials
+RealTime connects to the Slack RealTime API using the Web client's credentials.
 
 #### func (WebClient) UsersList
 
 ```go
 func (c WebClient) UsersList() (users []UserInfo, err error)
 ```
-UsersList returns a list of user information
+UsersList returns a list of user information.

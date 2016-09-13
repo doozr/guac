@@ -1,7 +1,7 @@
 package guac
 
-// RealTimeMessage is a chat message sent to a user or channel
-type RealTimeMessage struct {
+// MessageEvent is a chat message sent to a user or channel.
+type MessageEvent struct {
 	Type    string `json:"type"`
 	ID      uint64 `json:"id"`
 	Channel string `json:"channel"`
@@ -9,15 +9,15 @@ type RealTimeMessage struct {
 	Text    string `json:"text"`
 }
 
-// RealTimePingPong is a ping and also the reciprocal pong
-type RealTimePingPong struct {
+// PingPongEvent is a ping and also the reciprocal pong.
+type PingPongEvent struct {
 	Type string `json:"type"`
 	ID   uint64 `json:"id"`
 }
 
-// RealTimeUserChange is a notification that something about a user has changed
-// Currently only username changes are supported
-type RealTimeUserChange struct {
+// UserChangeEvent is a notification that something about a user has changed.
+// Currently only username changes are supported.
+type UserChangeEvent struct {
 	Type     string `json:"type"`
 	UserInfo `json:"user"`
 }

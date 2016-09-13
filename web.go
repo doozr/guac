@@ -10,12 +10,12 @@ import (
 	"github.com/doozr/guac/websocket"
 )
 
-// WebClient is an interface to the Slack Web API
+// WebClient is an interface to the Slack Web API.
 type WebClient struct {
 	client web.Client
 }
 
-// RealTime connects to the Slack RealTime API using the Web client's credentials
+// RealTime connects to the Slack RealTime API using the Web client's credentials.
 func (c WebClient) RealTime() (client RealTimeClient, err error) {
 	raw, err := websocket.New(c.client).Dial()
 	if err != nil {
@@ -29,7 +29,7 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 	return
 }
 
-// UsersList returns a list of user information
+// UsersList returns a list of user information.
 func (c WebClient) UsersList() (users []UserInfo, err error) {
 	response, err := c.client.Get("users.list", nil)
 	if err != nil {
@@ -54,7 +54,7 @@ func (c WebClient) UsersList() (users []UserInfo, err error) {
 	return
 }
 
-// ChannelsList gets a list of channel information
+// ChannelsList gets a list of channel information.
 func (c WebClient) ChannelsList() (channels []ChannelInfo, err error) {
 	response, err := c.client.Get("channels.list", nil)
 	if err != nil {
@@ -79,8 +79,8 @@ func (c WebClient) ChannelsList() (channels []ChannelInfo, err error) {
 	return
 }
 
-// GroupsList gets a list of private channel information
-// Slack's nomenclature for different types of channel is weird
+// GroupsList gets a list of private channel information.
+// Slack's nomenclature for different types of channel is weird.
 func (c WebClient) GroupsList() (channels []ChannelInfo, err error) {
 	response, err := c.client.Get("groups.list", nil)
 	if err != nil {
@@ -105,7 +105,7 @@ func (c WebClient) GroupsList() (channels []ChannelInfo, err error) {
 	return
 }
 
-// IMOpen opens or returns an IM channel with a specified user
+// IMOpen opens or returns an IM channel with a specified user.
 func (c WebClient) IMOpen(user string) (channel string, err error) {
 	values := url.Values{}
 	values.Add("user", user)

@@ -6,20 +6,21 @@ import (
 	"github.com/doozr/guac/realtime"
 )
 
+// convertEvent accepts any RawEvent and converts it to a concrete type.
 func convertEvent(raw realtime.RawEvent) (event interface{}, err error) {
 	switch raw.EventType() {
 	case "pong":
-		e := RealTimePingPong{}
+		e := PingPongEvent{}
 		err = json.Unmarshal(raw.Payload(), &e)
 		event = e
 
 	case "message":
-		e := RealTimeMessage{}
+		e := MessageEvent{}
 		err = json.Unmarshal(raw.Payload(), &e)
 		event = e
 
 	case "user_change":
-		e := RealTimeUserChange{}
+		e := UserChangeEvent{}
 		err = json.Unmarshal(raw.Payload(), &e)
 		event = e
 	}

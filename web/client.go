@@ -9,19 +9,19 @@ import (
 	"net/url"
 )
 
-// Client of the Web API
+// Client of the Web API.
 type client struct {
 	token string
 }
 
-// New web API client
+// New web API client.
 func New(token string) Client {
 	return client{
 		token: token,
 	}
 }
 
-// Get an event from the API
+// Get an event from the API.
 func (c client) Get(endPoint string, values url.Values) (response Response, err error) {
 	if values == nil {
 		values = url.Values{}
@@ -55,7 +55,7 @@ func (c client) Get(endPoint string, values url.Values) (response Response, err 
 	return
 }
 
-// Post an action request and return the response
+// Post an action request and return the response.
 func (c client) Post(endPoint string, values url.Values) (response Response, err error) {
 	if values == nil {
 		values = url.Values{}

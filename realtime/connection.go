@@ -6,12 +6,12 @@ import (
 	"github.com/doozr/guac/websocket"
 )
 
-// Connection represents an open Slack RealTime connection
+// Connection represents an open Slack RealTime connection.
 type connection struct {
 	raw websocket.Connection
 }
 
-// New to the Slack RealTime API
+// New connection to the Slack RealTime API.
 func New(raw websocket.Connection) (conn Connection) {
 	conn = &connection{
 		raw: raw,
@@ -19,11 +19,12 @@ func New(raw websocket.Connection) (conn Connection) {
 	return
 }
 
+// Close the connection.
 func (c connection) Close() {
 	c.raw.Close()
 }
 
-// Receive a Slack RealTimeEvent
+// Receive a Slack RealTimeEvent.
 func (c connection) Receive() (event RawEvent, err error) {
 	payload, err := c.raw.Receive()
 	if err != nil {
@@ -41,7 +42,7 @@ func (c connection) Receive() (event RawEvent, err error) {
 	return
 }
 
-// Send a Slack RealTime event
+// Send a Slack RealTime event.
 func (c connection) Send(event RawEvent) (err error) {
 	err = c.raw.Send(event.Payload())
 	return
