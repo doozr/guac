@@ -2,11 +2,15 @@
 
 Install:
 
-    go get github.com/doozr/guac
+```
+go get github.com/doozr/guac
+```
 
 And use:
 
-    import "github.com/doozr/guac"
+```go
+import "github.com/doozr/guac"
+```
 
 Package guac provides clients to connect bots to Slack.
 
@@ -18,14 +22,14 @@ the *Custom Integrations* section of the Slack admin panel. Bots can discover
 their own name and channels via the API itself so none of that information is
 required.
 
-``` go
+```go
 
 slack := guac.New(token) ```
 
 Connecting to the Real Time API is done via an existing web client and opens a
 websocket to communicate with the Slack service.
 
-``` go
+```go
 
 rtm := slack.RealTime() ```
 
@@ -33,7 +37,9 @@ Receive events via the `RealTime.Receive` method. All events are returned from
 the same function so the best way to handle them is with a type switch. this
 could call handlers, push the events onto channels, or anything else.
 
-``` go func receiveEvents(rtm slack.RealTimeClient,
+```go
+
+func receiveEvents(rtm slack.RealTimeClient,
 
                    done chan bool,
                    messages chan MessageEvent,

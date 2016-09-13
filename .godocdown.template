@@ -2,11 +2,15 @@
 
 Install:
 
-    go get {{ .ImportPath}}
+```
+go get {{ .ImportPath}}
+```
 
 And use:
 
-    import "{{ .ImportPath }}"
+```go
+import "{{ .ImportPath }}"
+```
 
 {{ .EmitSynopsis }}
 
