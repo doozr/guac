@@ -6,7 +6,7 @@ import (
 	"github.com/doozr/guac/realtime"
 )
 
-var counter uint64 = 1
+var counter uint64
 
 // Get the next ID for this run
 func nextID() uint64 {
@@ -27,6 +27,7 @@ func (g RealTimeClient) Close() {
 func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 	id := nextID()
 	m := RealTimeMessage{
+		Type:    "message",
 		ID:      id,
 		Channel: channel,
 		User:    "",
@@ -39,8 +40,9 @@ func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 // Ping sends a ping request
 func (g RealTimeClient) Ping() (err error) {
 	id := nextID()
-	m := RealTimePing{
-		ID: id,
+	m := RealTimePingPong{
+		Type: "ping",
+		ID:   id,
 	}
 	return g.connection.Send(eventWrapper{"ping", m})
 }

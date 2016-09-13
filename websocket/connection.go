@@ -20,7 +20,8 @@ func (c connection) ID() string {
 
 // Send a payload over the websocket
 func (c connection) Send(payload []byte) (err error) {
-	err = websocket.Message.Send(c.websocket, payload)
+	// Force it to be a TextFrame by wrapping in string
+	err = websocket.Message.Send(c.websocket, string(payload))
 	return
 }
 

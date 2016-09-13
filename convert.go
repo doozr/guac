@@ -8,8 +8,8 @@ import (
 
 func convertEvent(raw realtime.RawEvent) (event interface{}, err error) {
 	switch raw.EventType() {
-	case "ping":
-		e := RealTimePing{}
+	case "pong":
+		e := RealTimePingPong{}
 		err = json.Unmarshal(raw.Payload(), &e)
 		event = e
 

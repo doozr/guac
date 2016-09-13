@@ -10,7 +10,7 @@ type RealTimeMessage struct {
 }
 
 // RealTimePing is a ping and also the reciprocal pong
-type RealTimePing struct {
+type RealTimePingPong struct {
 	Type string `json:"type"`
 	ID   uint64 `json:"id"`
 }

@@ -90,7 +90,7 @@ func TestReceivePing(t *testing.T) {
 			"type": "ping",
 			"id": 1234
 		}`,
-		RealTimePing{
+		RealTimePingPong{
 			Type: "ping",
 			ID:   1234,
 		})
@@ -155,7 +155,7 @@ func TestDoesNotReturnUnknown(t *testing.T) {
 		t.Fatal("Unexpected error", err)
 	}
 
-	if _, ok := event.(RealTimePing); !ok {
+	if _, ok := event.(RealTimePingPong); !ok {
 		t.Fatal("Expected RealTimePing instance", event)
 	}
 }
@@ -207,7 +207,7 @@ func TestPing(t *testing.T) {
 		t.Fatal("Event type should be `ping`", event.EventType())
 	}
 
-	var ping RealTimePing
+	var ping RealTimePingPong
 	err = json.Unmarshal(event.Payload(), &ping)
 
 	if err != nil {
