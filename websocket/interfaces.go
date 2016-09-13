@@ -2,6 +2,7 @@ package websocket
 
 // Connection sends and receives byte arrays to the Slack RealTime API
 type Connection interface {
+	Close()
 	ID() string
 	Send([]byte) error
 	Receive() ([]byte, error)

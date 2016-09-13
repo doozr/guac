@@ -8,6 +8,11 @@ type connection struct {
 	websocket *websocket.Conn
 }
 
+// Close terminates the web socket
+func (c connection) Close() {
+	c.websocket.Close()
+}
+
 // ID returns the ID associated with the websocket
 func (c connection) ID() string {
 	return c.id

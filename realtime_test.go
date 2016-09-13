@@ -10,8 +10,13 @@ import (
 )
 
 type TestRealTimeConnection struct {
+	closed  chan bool
 	receive func() (realtime.RawEvent, error)
 	send    func(realtime.RawEvent) error
+}
+
+func (c TestRealTimeConnection) Close() {
+	close(c.closed)
 }
 
 func (c TestRealTimeConnection) Send(event realtime.RawEvent) error {
@@ -33,6 +38,22 @@ func (e TestRealTimeEvent) EventType() string {
 
 func (e TestRealTimeEvent) Payload() []byte {
 	return e.payload
+}
+
+func TestClosed(t *testing.T) {
+	realTimeConnection := TestRealTimeConnection{
+		closed: make(chan bool),
+	}
+
+	realTime := RealTimeClient{realTimeConnection}
+
+	realTime.Close()
+
+	select {
+	case <-realTimeConnection.closed:
+	default:
+		t.Fatal("Expected connection to be closed")
+	}
 }
 
 func receiveEvent(t *testing.T, eventType string, payload string, expected interface{}) {

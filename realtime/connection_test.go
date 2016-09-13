@@ -8,8 +8,13 @@ import (
 )
 
 type TestRawConnection struct {
+	closed  chan bool
 	receive func() ([]byte, error)
 	send    func([]byte) error
+}
+
+func (c TestRawConnection) Close() {
+	close(c.closed)
 }
 
 func (c TestRawConnection) ID() string {
@@ -22,6 +27,21 @@ func (c TestRawConnection) Receive() (payload []byte, err error) {
 
 func (c TestRawConnection) Send(payload []byte) (err error) {
 	return c.send(payload)
+}
+
+func TestClose(t *testing.T) {
+	raw := TestRawConnection{
+		closed: make(chan bool),
+	}
+	conn := New(raw)
+
+	conn.Close()
+
+	select {
+	case <-raw.closed: // Responds if channel is closed
+	default:
+		t.Fatal("Expected connection to be closed")
+	}
 }
 
 func TestSuccessfulReceive(t *testing.T) {

@@ -18,6 +18,11 @@ type RealTimeClient struct {
 	connection realtime.Connection
 }
 
+// Close terminates the connection
+func (g RealTimeClient) Close() {
+	g.connection.Close()
+}
+
 // PostMessage sends a chat message to the given channel
 func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 	id := nextID()
