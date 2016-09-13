@@ -84,14 +84,14 @@ func receiveEvent(t *testing.T, eventType string, payload string, expected inter
 	}
 }
 
-func TestReceivePing(t *testing.T) {
-	receiveEvent(t, "ping",
+func TestReceivePong(t *testing.T) {
+	receiveEvent(t, "pong",
 		`{
-			"type": "ping",
+			"type": "pong",
 			"id": 1234
 		}`,
 		RealTimePingPong{
-			Type: "ping",
+			Type: "pong",
 			ID:   1234,
 		})
 }
@@ -125,7 +125,7 @@ func TestReceiveUserChance(t *testing.T) {
 		}`,
 		RealTimeUserChange{
 			Type: "user_change",
-			User: UserInfo{
+			UserInfo: UserInfo{
 				ID:   "U1234567",
 				Name: "Mr Test",
 			},
@@ -136,7 +136,7 @@ func TestDoesNotReturnUnknown(t *testing.T) {
 	type eventFn func() (string, []byte)
 	incoming := make(chan eventFn, 2)
 	incoming <- func() (string, []byte) { return "unknown", []byte(`{ "type": "uknown", "field": "value" }`) }
-	incoming <- func() (string, []byte) { return "ping", []byte(`{ "type": "ping", "id": 1234 }`) }
+	incoming <- func() (string, []byte) { return "pong", []byte(`{ "type": "pong", "id": 1234 }`) }
 	realTimeConnection := TestRealTimeConnection{
 		receive: func() (realtime.RawEvent, error) {
 			fn := <-incoming

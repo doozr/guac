@@ -9,7 +9,7 @@ type RealTimeMessage struct {
 	Text    string `json:"text"`
 }
 
-// RealTimePing is a ping and also the reciprocal pong
+// RealTimePingPong is a ping and also the reciprocal pong
 type RealTimePingPong struct {
 	Type string `json:"type"`
 	ID   uint64 `json:"id"`
@@ -18,6 +18,6 @@ type RealTimePingPong struct {
 // RealTimeUserChange is a notification that something about a user has changed
 // Currently only username changes are supported
 type RealTimeUserChange struct {
-	Type string   `json:"type"`
-	User UserInfo `json:"user"`
+	Type     string `json:"type"`
+	UserInfo `json:"user"`
 }
