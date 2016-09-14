@@ -10,7 +10,7 @@ import (
 )
 
 type TestRealTimeConnection struct {
-	closed  chan bool
+	closed  chan struct{}
 	receive func() (realtime.RawEvent, error)
 	send    func(realtime.RawEvent) error
 }
@@ -42,7 +42,7 @@ func (e TestRealTimeEvent) Payload() []byte {
 
 func TestClosed(t *testing.T) {
 	realTimeConnection := TestRealTimeConnection{
-		closed: make(chan bool),
+		closed: make(chan struct{}),
 	}
 
 	realTime := RealTimeClient{realTimeConnection}

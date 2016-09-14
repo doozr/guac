@@ -8,7 +8,7 @@ import (
 )
 
 type TestRawConnection struct {
-	closed  chan bool
+	closed  chan struct{}
 	receive func() ([]byte, error)
 	send    func([]byte) error
 }
@@ -31,7 +31,7 @@ func (c TestRawConnection) Send(payload []byte) (err error) {
 
 func TestClose(t *testing.T) {
 	raw := TestRawConnection{
-		closed: make(chan bool),
+		closed: make(chan struct{}),
 	}
 	conn := New(raw)
 
