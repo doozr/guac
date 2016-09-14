@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/doozr/jot"
 )
 
 // Client of the Web API.
@@ -29,6 +31,7 @@ func (c client) Get(endPoint string, values url.Values) (response Response, err 
 	values.Add("token", c.token)
 	url := fmt.Sprintf("https://slack.com/api/%s?%s", endPoint, values.Encode())
 
+	jot.Print("Web GET: ", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return
@@ -44,6 +47,7 @@ func (c client) Get(endPoint string, values url.Values) (response Response, err 
 	if err != nil {
 		return
 	}
+	jot.Printf("Web GET to %s received %s", url, string(bytes))
 
 	respObj := apiResponse{}
 	err = json.Unmarshal(bytes, &respObj)
@@ -61,7 +65,9 @@ func (c client) Post(endPoint string, values url.Values) (response Response, err
 
 	values.Add("token", c.token)
 
-	resp, err := http.PostForm("https://slack.com/api/"+endPoint, values)
+	url := "https://slack.com/api/" + endPoint
+	jot.Printf("Web POST: %s with form values: %s", url, values.Encode())
+	resp, err := http.PostForm(url, values)
 	if err != nil {
 		return
 	}
@@ -73,10 +79,10 @@ func (c client) Post(endPoint string, values url.Values) (response Response, err
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-
 	if err != nil {
 		return
 	}
+	jot.Printf("Web POST to %s received %s", url, string(bytes))
 
 	respObj := apiResponse{}
 	err = json.Unmarshal(bytes, &respObj)

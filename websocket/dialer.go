@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/doozr/guac/web"
+	"github.com/doozr/jot"
 
 	"golang.org/x/net/websocket"
 )
@@ -25,7 +26,9 @@ func (d dialer) Dial() (conn Connection, err error) {
 	if err != nil {
 		return
 	}
+	jot.Print("Retrieved identity: ", id, name)
 
+	jot.Print("Dialing ", wsurl)
 	ws, err := websocket.Dial(wsurl, "", "https://api.slack.com/")
 	if err != nil {
 		return
