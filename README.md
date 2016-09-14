@@ -21,7 +21,7 @@ Connecting to the Real Time API is done via an existing web client and opens a
 websocket to communicate with the Slack service.
 
 ```go
-rtm := slack.RealTime()
+rtm, err := slack.RealTime()
 ```
 
 Receive events via the `Receive()` method. All events are returned from the same
