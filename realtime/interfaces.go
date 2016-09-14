@@ -13,6 +13,7 @@ type RawEvent interface {
 
 // Connection is an active Slack RealTime API connection.
 type Connection interface {
+	ID() string
 	Close()
 	Send(RawEvent) error
 	Receive() (RawEvent, error)

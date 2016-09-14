@@ -19,6 +19,11 @@ func New(raw websocket.Connection) (conn Connection) {
 	return
 }
 
+// Get the ID of the client
+func (c connection) ID() string {
+	return c.raw.ID()
+}
+
 // Close the connection.
 func (c connection) Close() {
 	c.raw.Close()

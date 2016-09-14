@@ -15,6 +15,10 @@ type TestRealTimeConnection struct {
 	send    func(realtime.RawEvent) error
 }
 
+func (c TestRealTimeConnection) ID() string {
+	return "U987654321"
+}
+
 func (c TestRealTimeConnection) Close() {
 	close(c.closed)
 }
