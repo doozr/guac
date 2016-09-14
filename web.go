@@ -27,6 +27,7 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 
 	realTimeConn := realtime.New(raw)
 	client = RealTimeClient{
+		WebClient:  c,
 		connection: realTimeConn,
 	}
 	return

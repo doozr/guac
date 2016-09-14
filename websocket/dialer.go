@@ -21,7 +21,7 @@ type dialer struct {
 
 // Dial a websocket.
 func (d dialer) Dial() (conn Connection, err error) {
-	wsurl, id, err := d.getWebsocketURL()
+	wsurl, id, name, err := d.getWebsocketURL()
 	if err != nil {
 		return
 	}
@@ -34,12 +34,13 @@ func (d dialer) Dial() (conn Connection, err error) {
 	conn = connection{
 		websocket: ws,
 		id:        id,
+		name:      name,
 	}
 	return
 }
 
 // getWebsocketURL gets the socket URL via the Web API.
-func (d dialer) getWebsocketURL() (wsurl string, id string, err error) {
+func (d dialer) getWebsocketURL() (wsurl string, id string, name string, err error) {
 	body, err := d.client.Get("rtm.start", nil)
 	if err != nil {
 		return
@@ -51,8 +52,11 @@ func (d dialer) getWebsocketURL() (wsurl string, id string, err error) {
 	}
 
 	var respObj struct {
-		ID  string `json:"id"`
-		URL string `json:"url"`
+		URL  string `json:"url"`
+		Self struct {
+			ID   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"self"`
 	}
 
 	err = json.Unmarshal(body.Payload(), &respObj)
@@ -66,6 +70,7 @@ func (d dialer) getWebsocketURL() (wsurl string, id string, err error) {
 	}
 
 	wsurl = respObj.URL
-	id = respObj.ID
+	id = respObj.Self.ID
+	name = respObj.Self.Name
 	return
 }

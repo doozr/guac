@@ -49,7 +49,9 @@ func TestClosed(t *testing.T) {
 		closed: make(chan struct{}),
 	}
 
-	realTime := RealTimeClient{realTimeConnection}
+	realTime := RealTimeClient{
+		connection: realTimeConnection,
+	}
 
 	realTime.Close()
 
@@ -76,7 +78,9 @@ func receiveEvent(t *testing.T, eventType string, payload string, expected inter
 		},
 	}
 
-	realTime := RealTimeClient{realTimeConnection}
+	realTime := RealTimeClient{
+		connection: realTimeConnection,
+	}
 
 	event, err := realTime.Receive()
 	if err != nil {
@@ -152,7 +156,9 @@ func TestDoesNotReturnUnknown(t *testing.T) {
 		},
 	}
 
-	realTime := RealTimeClient{realTimeConnection}
+	realTime := RealTimeClient{
+		connection: realTimeConnection,
+	}
 
 	event, err := realTime.Receive()
 	if err != nil {
@@ -171,7 +177,9 @@ func TestReceiveError(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{realTimeConnection}
+	rtm := RealTimeClient{
+		connection: realTimeConnection,
+	}
 
 	event, err := rtm.Receive()
 
@@ -196,8 +204,9 @@ func TestPing(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{realTimeConnection}
-
+	rtm := RealTimeClient{
+		connection: realTimeConnection,
+	}
 	err := rtm.Ping()
 	if err != nil {
 		t.Fatal("Unexpected error", err)
@@ -230,8 +239,9 @@ func TestPingError(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{realTimeConnection}
-
+	rtm := RealTimeClient{
+		connection: realTimeConnection,
+	}
 	err := rtm.Ping()
 	if err == nil {
 		t.Fatal("Expected error")
@@ -250,8 +260,9 @@ func TestPostMessage(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{realTimeConnection}
-
+	rtm := RealTimeClient{
+		connection: realTimeConnection,
+	}
 	channel := "#F00DD00D"
 	text := "this is the message"
 	err := rtm.PostMessage(channel, text)
@@ -298,8 +309,9 @@ func TestPostMessageError(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{realTimeConnection}
-
+	rtm := RealTimeClient{
+		connection: realTimeConnection,
+	}
 	channel := "#F00DD00D"
 	text := "this is the message"
 	err := rtm.PostMessage(channel, text)

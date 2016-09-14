@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -29,7 +28,6 @@ func (c client) Get(endPoint string, values url.Values) (response Response, err 
 
 	values.Add("token", c.token)
 	url := fmt.Sprintf("https://slack.com/api/%s?%s", endPoint, values.Encode())
-	log.Printf("Web API GET %s", url)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -62,9 +60,8 @@ func (c client) Post(endPoint string, values url.Values) (response Response, err
 	}
 
 	values.Add("token", c.token)
-	log.Printf("Web API POST %s with values %s", endPoint, values.Encode())
 
-	resp, err := http.PostForm(endPoint, values)
+	resp, err := http.PostForm("https://slack.com/api/"+endPoint, values)
 	if err != nil {
 		return
 	}

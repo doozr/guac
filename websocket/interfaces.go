@@ -4,6 +4,7 @@ package websocket
 type Connection interface {
 	Close()
 	ID() string
+	Name() string
 	Send([]byte) error
 	Receive() ([]byte, error)
 }

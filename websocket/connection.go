@@ -5,6 +5,7 @@ import "golang.org/x/net/websocket"
 // Connection represents a connected websocket.
 type connection struct {
 	id        string
+	name      string
 	websocket *websocket.Conn
 	err       error
 }
@@ -17,6 +18,11 @@ func (c connection) Close() {
 // ID returns the ID associated with the websocket.
 func (c connection) ID() string {
 	return c.id
+}
+
+// Name returns the username associated with the websocket
+func (c connection) Name() string {
+	return c.name
 }
 
 // Send a payload over the websocket.

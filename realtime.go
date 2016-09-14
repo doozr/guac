@@ -21,7 +21,18 @@ func nextID() uint64 {
 //
 // Subsequent calls after an error will result in the same error.
 type RealTimeClient struct {
+	WebClient
 	connection realtime.Connection
+}
+
+// ID of the bot
+func (g RealTimeClient) ID() string {
+	return g.connection.ID()
+}
+
+// Name of the bot
+func (g RealTimeClient) Name() string {
+	return g.connection.Name()
 }
 
 // Close terminates the connection.
