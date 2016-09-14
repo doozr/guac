@@ -1,4 +1,4 @@
-# {{ .Name }}
+# Guac API Reference
 
 Install:
 
@@ -6,7 +6,7 @@ Install:
 go get {{ .ImportPath}}
 ```
 
-And use:
+Use:
 
 ```go
 import "{{ .ImportPath }}"
