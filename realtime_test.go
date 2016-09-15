@@ -19,6 +19,10 @@ func (c TestRealTimeConnection) ID() string {
 	return "U987654321"
 }
 
+func (c TestRealTimeConnection) Name() string {
+	return "my_user_name"
+}
+
 func (c TestRealTimeConnection) Close() {
 	close(c.closed)
 }

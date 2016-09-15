@@ -21,6 +21,10 @@ func (c TestRawConnection) ID() string {
 	return "testing"
 }
 
+func (c TestRawConnection) Name() string {
+	return "my_user_name"
+}
+
 func (c TestRawConnection) Receive() (payload []byte, err error) {
 	return c.receive()
 }
