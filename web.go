@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/doozr/guac/realtime"
+	"github.com/doozr/guac/reconnect"
 	"github.com/doozr/guac/web"
 	"github.com/doozr/guac/websocket"
 )
@@ -26,6 +27,19 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 	}
 
 	realTimeConn := realtime.New(raw)
+	client = RealTimeClient{
+		WebClient:  c,
+		connection: realTimeConn,
+	}
+	return
+}
+
+// PersistentRealTime connects to the Slack RealTime API using the Web client's credentials
+// and reconnects whenever the connection drops.
+//
+// The only way to stop it reconnecting is to use RealTimeClient.Close()
+func (c WebClient) PersistentRealTime() (client RealTimeClient, err error) {
+	realTimeConn := reconnect.New(c.client)
 	client = RealTimeClient{
 		WebClient:  c,
 		connection: realTimeConn,
