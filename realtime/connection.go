@@ -1,4 +1,4 @@
-package websocket
+package realtime
 
 import (
 	"github.com/doozr/jot"

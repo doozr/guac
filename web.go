@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/doozr/guac/realtime"
 	"github.com/doozr/guac/reconnect"
 	"github.com/doozr/guac/web"
-	"github.com/doozr/guac/websocket"
 )
 
 // WebClient is an interface to the Slack Web API.
@@ -20,7 +20,7 @@ type WebClient struct {
 // The returned object represents a websocket connection that remains open
 // between calls until the Close method is called.
 func (c WebClient) RealTime() (client RealTimeClient, err error) {
-	websocketConn, err := websocket.New(c.client).Dial()
+	websocketConn, err := realtime.New(c.client).Dial()
 	if err != nil {
 		return
 	}

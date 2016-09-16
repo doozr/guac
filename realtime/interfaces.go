@@ -1,23 +1,17 @@
-// Package realtime contains a client for the Slack Real Time API that sends
-// and receives events via a websocket.
+// Package realtime contains a websocket dialer and connection for sending
+// and receiving JSON as raw bytes from the Slack API.
 package realtime
 
-// Event is the base interface to any Slack RealTime event.
-type Event interface {
-	EventType() string
-}
-
-// RawEvent is a raw Slack RealTime event ready for receiving or sending.
-type RawEvent interface {
-	EventType() string
-	Payload() []byte
-}
-
-// Connection is an active Slack RealTime API connection.
+// Connection sends and receives byte arrays to the Slack RealTime API.
 type Connection interface {
+	Close()
 	ID() string
 	Name() string
-	Close()
-	Send(RawEvent) error
-	Receive() (RawEvent, error)
+	Send([]byte) error
+	Receive() ([]byte, error)
+}
+
+// Dialer makes raw connections to the Slack RealTime API.
+type Dialer interface {
+	Dial() (Connection, error)
 }

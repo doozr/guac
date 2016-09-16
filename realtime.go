@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"sync/atomic"
 
-	"github.com/doozr/guac/websocket"
+	"github.com/doozr/guac/realtime"
 )
 
 var counter uint64
@@ -23,7 +23,7 @@ func nextID() uint64 {
 // Subsequent calls after an error will result in the same error.
 type RealTimeClient struct {
 	WebClient
-	connection websocket.Connection
+	connection realtime.Connection
 }
 
 // ID of the bot

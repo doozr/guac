@@ -7,8 +7,8 @@ import (
 	"log"
 	"sync"
 
+	"github.com/doozr/guac/realtime"
 	"github.com/doozr/guac/web"
-	"github.com/doozr/guac/websocket"
 	"github.com/doozr/jot"
 )
 
@@ -28,7 +28,7 @@ type asyncEvent struct {
 }
 
 // New connection to the Slack RealTime API.
-func New(client web.Client) (conn websocket.Connection) {
+func New(client web.Client) (conn realtime.Connection) {
 	reconn := &reconnect{
 		client:      client,
 		receiveChan: make(chan []byte),

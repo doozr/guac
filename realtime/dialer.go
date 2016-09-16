@@ -1,4 +1,4 @@
-package websocket
+package realtime
 
 import (
 	"encoding/json"
