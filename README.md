@@ -95,8 +95,9 @@ as frequently as your pings. If there is no incoming message for a significant
 period, it may be that the connection has hung and should be reconnected.
 
 The PersistentRealTime connection accepts a duration to be considered "inactive"
-and will reconnect if that timeout is exceeded between messages. It does not
-send ping requests of its own; they must still be sent.
+and will reconnect if that timeout is exceeded between messages. Not that it
+does not send ping requests; it only times out if nothing comes back. Make sure
+pings are being sent to prevent timeout.
 
 ## Limitations
 
