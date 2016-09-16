@@ -37,7 +37,8 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 //
 // The only way to stop it reconnecting is to use RealTimeClient.Close()
 func (c WebClient) PersistentRealTime() (client RealTimeClient, err error) {
-	websocketConn := persistent.New(c.client)
+	dialer := realtime.New(c.client)
+	websocketConn := persistent.New(dialer)
 	client = RealTimeClient{
 		WebClient:  c,
 		connection: websocketConn,

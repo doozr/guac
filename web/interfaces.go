@@ -13,6 +13,6 @@ type Response interface {
 
 // Client is a client to the Slack Web API.
 type Client interface {
-	Get(endPoint string, values url.Values) (Response, error)
-	Post(endPoint string, values url.Values) (Response, error)
+	Get(string, url.Values) (Response, error)
+	Post(string, url.Values) (Response, error)
 }

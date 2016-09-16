@@ -10,15 +10,23 @@ import (
 	"github.com/doozr/jot"
 )
 
+// httpClient interface we will use to actually do requests
+type httpClient interface {
+	Get(string) (*http.Response, error)
+	PostForm(string, url.Values) (*http.Response, error)
+}
+
 // Client of the Web API.
 type client struct {
 	token string
+	http  httpClient
 }
 
 // New web API client.
-func New(token string) Client {
+func New(token string, http httpClient) Client {
 	return client{
 		token: token,
+		http:  http,
 	}
 }
 
@@ -32,7 +40,7 @@ func (c client) Get(endPoint string, values url.Values) (response Response, err 
 	url := fmt.Sprintf("https://slack.com/api/%s?%s", endPoint, values.Encode())
 
 	jot.Print("web.client: GET ", url)
-	resp, err := http.Get(url)
+	resp, err := c.http.Get(url)
 	if err != nil {
 		return
 	}
@@ -67,7 +75,7 @@ func (c client) Post(endPoint string, values url.Values) (response Response, err
 
 	url := "https://slack.com/api/" + endPoint
 	jot.Printf("web.client: POST to %s with form values: %s", url, values.Encode())
-	resp, err := http.PostForm(url, values)
+	resp, err := c.http.PostForm(url, values)
 	if err != nil {
 		return
 	}

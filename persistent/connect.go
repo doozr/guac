@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/doozr/guac/realtime"
-	"github.com/doozr/guac/web"
 	"github.com/doozr/jot"
 )
 
@@ -13,7 +12,7 @@ import (
 //
 // Backs off retries from 1s, 2s, 5s, 10s, 30s and 1 minute, and retries at 1 minute
 // intervals after that. Close the `done` channel to stop retrying.
-func mustConnect(client web.Client, done chan struct{}) (ws realtime.Connection, ok bool) {
+func mustConnect(dialer realtime.Dialer, done chan struct{}) (ws realtime.Connection, ok bool) {
 	backoffTimes := []time.Duration{
 		1 * time.Second,
 		2 * time.Second,
@@ -26,7 +25,7 @@ func mustConnect(client web.Client, done chan struct{}) (ws realtime.Connection,
 
 	var err error
 	for {
-		ws, err = realtime.New(client).Dial()
+		ws, err = dialer.Dial()
 		if err == nil {
 			jot.Print("persistent.mustConnect: websocket connected")
 			ok = true

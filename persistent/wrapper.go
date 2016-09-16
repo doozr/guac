@@ -8,14 +8,13 @@ import (
 	"sync"
 
 	"github.com/doozr/guac/realtime"
-	"github.com/doozr/guac/web"
 	"github.com/doozr/jot"
 )
 
 type reconnect struct {
 	id          string
 	name        string
-	client      web.Client
+	dialer      realtime.Dialer
 	receiveChan chan []byte
 	sendChan    chan asyncEvent
 	done        chan struct{}
@@ -28,9 +27,9 @@ type asyncEvent struct {
 }
 
 // New connection to the Slack RealTime API.
-func New(client web.Client) (conn realtime.Connection) {
+func New(dialer realtime.Dialer) (conn realtime.Connection) {
 	reconn := &reconnect{
-		client:      client,
+		dialer:      dialer,
 		receiveChan: make(chan []byte),
 		sendChan:    make(chan asyncEvent),
 		done:        make(chan struct{}),
@@ -68,7 +67,7 @@ func (c reconnect) run(ready chan struct{}) {
 		}
 
 		jot.Print("persistent.run: connecting to Slack")
-		r, ok := mustConnect(c.client, c.done)
+		r, ok := mustConnect(c.dialer, c.done)
 		if ok {
 			// If we are connected, set the ID and name
 			c.id = r.ID()
