@@ -7,8 +7,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/doozr/guac/realtime"
 	"github.com/doozr/guac/web"
+	"github.com/doozr/guac/websocket"
 	"github.com/doozr/jot"
 )
 
@@ -16,22 +16,22 @@ type reconnect struct {
 	id          string
 	name        string
 	client      web.Client
-	receiveChan chan realtime.RawEvent
+	receiveChan chan []byte
 	sendChan    chan asyncEvent
 	done        chan struct{}
 	wg          *sync.WaitGroup
 }
 
 type asyncEvent struct {
-	event    realtime.RawEvent
+	event    []byte
 	callback chan error
 }
 
 // New connection to the Slack RealTime API.
-func New(client web.Client) (conn realtime.Connection) {
+func New(client web.Client) (conn websocket.Connection) {
 	reconn := &reconnect{
 		client:      client,
-		receiveChan: make(chan realtime.RawEvent),
+		receiveChan: make(chan []byte),
 		sendChan:    make(chan asyncEvent),
 		done:        make(chan struct{}),
 		wg:          &sync.WaitGroup{},
@@ -111,10 +111,10 @@ func (c reconnect) Close() {
 }
 
 // Send an asynchronous event and wait for confirmation.
-func (c reconnect) Send(event realtime.RawEvent) (err error) {
+func (c reconnect) Send(raw []byte) (err error) {
 	callback := make(chan error)
 	a := asyncEvent{
-		event:    event,
+		event:    raw,
 		callback: callback,
 	}
 
@@ -130,15 +130,15 @@ func (c reconnect) Send(event realtime.RawEvent) (err error) {
 }
 
 // Receive an incoming event.
-func (c reconnect) Receive() (event realtime.RawEvent, err error) {
+func (c reconnect) Receive() (raw []byte, err error) {
 	jot.Print("reconnect.Receive: awaiting event")
-	event, ok := <-c.receiveChan
+	raw, ok := <-c.receiveChan
 	if !ok {
 		jot.Print("reconnect.Receive: error")
 		err = fmt.Errorf("Channel closed")
 		return
 	}
 
-	jot.Print("reconnect.Receive: event ", event.EventType(), " ", string(event.Payload()))
+	jot.Print("reconnect.Receive: event ", string(raw))
 	return
 }

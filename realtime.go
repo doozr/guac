@@ -1,9 +1,10 @@
 package guac
 
 import (
+	"encoding/json"
 	"sync/atomic"
 
-	"github.com/doozr/guac/realtime"
+	"github.com/doozr/guac/websocket"
 )
 
 var counter uint64
@@ -22,7 +23,7 @@ func nextID() uint64 {
 // Subsequent calls after an error will result in the same error.
 type RealTimeClient struct {
 	WebClient
-	connection realtime.Connection
+	connection websocket.Connection
 }
 
 // ID of the bot
@@ -53,8 +54,11 @@ func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 		User:    "",
 		Text:    text,
 	}
-
-	return g.connection.Send(eventWrapper{"message", m})
+	payload, err := json.Marshal(m)
+	if err == nil {
+		err = g.connection.Send(payload)
+	}
+	return
 }
 
 // Ping sends a ping request.
@@ -66,7 +70,11 @@ func (g RealTimeClient) Ping() (err error) {
 		Type: "ping",
 		ID:   id,
 	}
-	return g.connection.Send(eventWrapper{"ping", m})
+	payload, err := json.Marshal(m)
+	if err == nil {
+		err = g.connection.Send(payload)
+	}
+	return
 }
 
 //Receive an event from the Slack RealTime API.
@@ -75,7 +83,7 @@ func (g RealTimeClient) Ping() (err error) {
 //checked with a type assertion to determine its type. If a message of an
 //as-yet unsupported type arrives it will be ignored.
 func (g RealTimeClient) Receive() (event interface{}, err error) {
-	var raw realtime.RawEvent
+	var raw []byte
 	for {
 		// Bail out on error immediately
 		raw, err = g.connection.Receive()

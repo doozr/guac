@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-
-	"github.com/doozr/guac/realtime"
 )
 
 type TestRealTimeConnection struct {
 	closed  chan struct{}
-	receive func() (realtime.RawEvent, error)
-	send    func(realtime.RawEvent) error
+	receive func() ([]byte, error)
+	send    func([]byte) error
 }
 
 func (c TestRealTimeConnection) ID() string {
@@ -27,11 +25,11 @@ func (c TestRealTimeConnection) Close() {
 	close(c.closed)
 }
 
-func (c TestRealTimeConnection) Send(event realtime.RawEvent) error {
+func (c TestRealTimeConnection) Send(event []byte) error {
 	return c.send(event)
 }
 
-func (c TestRealTimeConnection) Receive() (realtime.RawEvent, error) {
+func (c TestRealTimeConnection) Receive() ([]byte, error) {
 	return c.receive()
 }
 
@@ -70,15 +68,12 @@ func receiveEvent(t *testing.T, eventType string, payload string, expected inter
 	bytes := []byte(payload)
 	called := false
 	realTimeConnection := TestRealTimeConnection{
-		receive: func() (realtime.RawEvent, error) {
+		receive: func() ([]byte, error) {
 			if called {
 				t.Fatal("RealTimeConnection.Receive called more than once")
 			}
 			called = true
-			return TestRealTimeEvent{
-				eventType: eventType,
-				payload:   bytes,
-			}, nil
+			return bytes, nil
 		},
 	}
 
@@ -145,18 +140,15 @@ func TestReceiveUserChance(t *testing.T) {
 }
 
 func TestDoesNotReturnUnknown(t *testing.T) {
-	type eventFn func() (string, []byte)
+	type eventFn func() []byte
 	incoming := make(chan eventFn, 2)
-	incoming <- func() (string, []byte) { return "unknown", []byte(`{ "type": "uknown", "field": "value" }`) }
-	incoming <- func() (string, []byte) { return "pong", []byte(`{ "type": "pong", "id": 1234 }`) }
+	incoming <- func() []byte { return []byte(`{ "type": "uknown", "field": "value" }`) }
+	incoming <- func() []byte { return []byte(`{ "type": "pong", "id": 1234 }`) }
 	realTimeConnection := TestRealTimeConnection{
-		receive: func() (realtime.RawEvent, error) {
+		receive: func() ([]byte, error) {
 			fn := <-incoming
-			eventType, bytes := fn()
-			return TestRealTimeEvent{
-				eventType: eventType,
-				payload:   bytes,
-			}, nil
+			bytes := fn()
+			return bytes, nil
 		},
 	}
 
@@ -176,7 +168,7 @@ func TestDoesNotReturnUnknown(t *testing.T) {
 
 func TestReceiveError(t *testing.T) {
 	realTimeConnection := TestRealTimeConnection{
-		receive: func() (realtime.RawEvent, error) {
+		receive: func() ([]byte, error) {
 			return nil, fmt.Errorf("Receive error")
 		},
 	}
@@ -197,9 +189,9 @@ func TestReceiveError(t *testing.T) {
 }
 
 func TestPing(t *testing.T) {
-	var event realtime.RawEvent
+	var event []byte
 	realTimeConnection := TestRealTimeConnection{
-		send: func(e realtime.RawEvent) error {
+		send: func(e []byte) error {
 			if event != nil {
 				t.Fatal("realTimeConnection.Send called more than once")
 			}
@@ -220,12 +212,8 @@ func TestPing(t *testing.T) {
 		t.Fatal("No event sent")
 	}
 
-	if event.EventType() != "ping" {
-		t.Fatal("Event type should be `ping`", event.EventType())
-	}
-
 	var ping PingPongEvent
-	err = json.Unmarshal(event.Payload(), &ping)
+	err = json.Unmarshal(event, &ping)
 
 	if err != nil {
 		t.Fatal("Unexpected error", err)
@@ -238,7 +226,7 @@ func TestPing(t *testing.T) {
 
 func TestPingError(t *testing.T) {
 	realTimeConnection := TestRealTimeConnection{
-		send: func(e realtime.RawEvent) error {
+		send: func(e []byte) error {
 			return fmt.Errorf("Ping error")
 		},
 	}
@@ -253,9 +241,9 @@ func TestPingError(t *testing.T) {
 }
 
 func TestPostMessage(t *testing.T) {
-	var event realtime.RawEvent
+	var event []byte
 	realTimeConnection := TestRealTimeConnection{
-		send: func(e realtime.RawEvent) error {
+		send: func(e []byte) error {
 			if event != nil {
 				t.Fatal("realTimeConnection.Send called more than once")
 			}
@@ -278,12 +266,8 @@ func TestPostMessage(t *testing.T) {
 		t.Fatal("No event sent")
 	}
 
-	if event.EventType() != "message" {
-		t.Fatal("Event type should be `message`", event.EventType())
-	}
-
 	var message MessageEvent
-	err = json.Unmarshal(event.Payload(), &message)
+	err = json.Unmarshal(event, &message)
 
 	if err != nil {
 		t.Fatal("Unexpected error", err)
@@ -308,7 +292,7 @@ func TestPostMessage(t *testing.T) {
 
 func TestPostMessageError(t *testing.T) {
 	realTimeConnection := TestRealTimeConnection{
-		send: func(e realtime.RawEvent) error {
+		send: func(e []byte) error {
 			return fmt.Errorf("PostMessage error")
 		},
 	}

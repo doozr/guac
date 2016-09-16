@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/doozr/guac/realtime"
 	"github.com/doozr/guac/reconnect"
 	"github.com/doozr/guac/web"
 	"github.com/doozr/guac/websocket"
@@ -21,15 +20,14 @@ type WebClient struct {
 // The returned object represents a websocket connection that remains open
 // between calls until the Close method is called.
 func (c WebClient) RealTime() (client RealTimeClient, err error) {
-	raw, err := websocket.New(c.client).Dial()
+	websocketConn, err := websocket.New(c.client).Dial()
 	if err != nil {
 		return
 	}
 
-	realTimeConn := realtime.New(raw)
 	client = RealTimeClient{
 		WebClient:  c,
-		connection: realTimeConn,
+		connection: websocketConn,
 	}
 	return
 }
@@ -39,10 +37,10 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 //
 // The only way to stop it reconnecting is to use RealTimeClient.Close()
 func (c WebClient) PersistentRealTime() (client RealTimeClient, err error) {
-	realTimeConn := reconnect.New(c.client)
+	websocketConn := reconnect.New(c.client)
 	client = RealTimeClient{
 		WebClient:  c,
-		connection: realTimeConn,
+		connection: websocketConn,
 	}
 	return
 }

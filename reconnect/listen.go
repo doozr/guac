@@ -3,15 +3,15 @@ package reconnect
 import (
 	"sync"
 
-	"github.com/doozr/guac/realtime"
+	"github.com/doozr/guac/websocket"
 	"github.com/doozr/jot"
 )
 
 // listen for incoming and outgoing events and pass them to the active connection.
 //
 // Terminate by closing the `done` channel.
-func listen(r realtime.Connection,
-	receiveChan chan realtime.RawEvent, sendChan chan asyncEvent,
+func listen(r websocket.Connection,
+	receiveChan chan []byte, sendChan chan asyncEvent,
 	done chan struct{}) {
 
 	wg := sync.WaitGroup{}
@@ -45,9 +45,9 @@ func listen(r realtime.Connection,
 // receive incoming events from a connection and put them on a channel.
 //
 // Terminate by closing the `done` channel and waiting on `wg`.
-func receive(r realtime.Connection, done chan struct{}, wg *sync.WaitGroup) (events chan realtime.RawEvent) {
+func receive(r websocket.Connection, done chan struct{}, wg *sync.WaitGroup) (events chan []byte) {
 	jot.Print("reconnect.receive: started")
-	events = make(chan realtime.RawEvent)
+	events = make(chan []byte)
 
 	wg.Add(1)
 	go func() {
