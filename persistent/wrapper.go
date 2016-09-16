@@ -1,6 +1,6 @@
-// Package reconnect contains a wrapper for guac.realtime to enable automatic
+// Package persistent contains a wrapper for guac.realtime to enable automatic
 // connection retries and reconnection on failure.
-package reconnect
+package persistent
 
 import (
 	"fmt"
@@ -54,9 +54,9 @@ func New(client web.Client) (conn realtime.Connection) {
 //
 // Terminate by closing the `c.done` channel and waiting on `c.wg`.
 func (c reconnect) run(ready chan struct{}) {
-	jot.Print("reconnect.run: started")
+	jot.Print("persistent.run: started")
 	defer func() {
-		jot.Print("reconnect.run: done")
+		jot.Print("persistent.run: done")
 		c.wg.Done()
 	}()
 
@@ -67,23 +67,23 @@ func (c reconnect) run(ready chan struct{}) {
 		default:
 		}
 
-		jot.Print("reconnect.run: connecting to Slack")
+		jot.Print("persistent.run: connecting to Slack")
 		r, ok := mustConnect(c.client, c.done)
 		if ok {
 			// If we are connected, set the ID and name
 			c.id = r.ID()
 			c.name = r.Name()
-			log.Print("reconnect.run: connected as ", r.Name())
+			log.Print("persistent.run: connected as ", r.Name())
 
 			// Only close ready if it's open
 			select {
 			case <-ready:
 			default:
-				jot.Print("reconnect.run: initial connection ready")
+				jot.Print("persistent.run: initial connection ready")
 				close(ready)
 			}
 
-			jot.Print("reconnect.run: listening for events")
+			jot.Print("persistent.run: listening for events")
 			listen(r, c.receiveChan, c.sendChan, c.done)
 		}
 	}
@@ -101,11 +101,11 @@ func (c reconnect) Name() string {
 
 // Close the persistent connection loop immediately.
 func (c reconnect) Close() {
-	jot.Print("reconnect.wrapper: closing down connections")
+	jot.Print("persistent.wrapper: closing down connections")
 	close(c.done)
 	c.wg.Wait()
 
-	jot.Print("reconnect.wrapper: closing down internal channels")
+	jot.Print("persistent.wrapper: closing down internal channels")
 	close(c.sendChan)
 	close(c.receiveChan)
 }
@@ -118,27 +118,27 @@ func (c reconnect) Send(raw []byte) (err error) {
 		callback: callback,
 	}
 
-	jot.Print("reconnect.Send sending async event: ", a)
+	jot.Print("persistent.Send sending async event: ", a)
 	c.sendChan <- a
 
-	jot.Print("reconnect.Send awaiting callback")
+	jot.Print("persistent.Send awaiting callback")
 	err = <-callback
 
-	jot.Print("reconnect.Send callback received")
+	jot.Print("persistent.Send callback received")
 	close(callback)
 	return err
 }
 
 // Receive an incoming event.
 func (c reconnect) Receive() (raw []byte, err error) {
-	jot.Print("reconnect.Receive: awaiting event")
+	jot.Print("persistent.Receive: awaiting event")
 	raw, ok := <-c.receiveChan
 	if !ok {
-		jot.Print("reconnect.Receive: error")
+		jot.Print("persistent.Receive: error")
 		err = fmt.Errorf("Channel closed")
 		return
 	}
 
-	jot.Print("reconnect.Receive: event ", string(raw))
+	jot.Print("persistent.Receive: event ", string(raw))
 	return
 }

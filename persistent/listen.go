@@ -1,4 +1,4 @@
-package reconnect
+package persistent
 
 import (
 	"sync"
@@ -18,13 +18,13 @@ func listen(r realtime.Connection,
 	events := receive(r, done, &wg)
 
 	defer func() {
-		jot.Print("reconnect.listen: shutting down")
+		jot.Print("persistent.listen: shutting down")
 
 		// Close the connection to stop waiting websockets immediately
 		r.Close()
 
 		wg.Wait()
-		jot.Print("reconnect.listen: done")
+		jot.Print("persistent.listen: done")
 	}()
 
 	for {
@@ -46,16 +46,16 @@ func listen(r realtime.Connection,
 //
 // Terminate by closing the `done` channel and waiting on `wg`.
 func receive(r realtime.Connection, done chan struct{}, wg *sync.WaitGroup) (events chan []byte) {
-	jot.Print("reconnect.receive: started")
+	jot.Print("persistent.receive: started")
 	events = make(chan []byte)
 
 	wg.Add(1)
 	go func() {
 		defer func() {
-			jot.Println("reconnect.receive: shutting down")
+			jot.Println("persistent.receive: shutting down")
 			close(events)
 			wg.Done()
-			jot.Print("reconnect.receive: done")
+			jot.Print("persistent.receive: done")
 		}()
 
 		for {
@@ -65,7 +65,7 @@ func receive(r realtime.Connection, done chan struct{}, wg *sync.WaitGroup) (eve
 			default:
 				event, err := r.Receive()
 				if err != nil {
-					jot.Print("reconnect.receive: error while receiving events: ", err)
+					jot.Print("persistent.receive: error while receiving events: ", err)
 					return
 				}
 				events <- event

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/doozr/guac/persistent"
 	"github.com/doozr/guac/realtime"
-	"github.com/doozr/guac/reconnect"
 	"github.com/doozr/guac/web"
 )
 
@@ -37,7 +37,7 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 //
 // The only way to stop it reconnecting is to use RealTimeClient.Close()
 func (c WebClient) PersistentRealTime() (client RealTimeClient, err error) {
-	websocketConn := reconnect.New(c.client)
+	websocketConn := persistent.New(c.client)
 	client = RealTimeClient{
 		WebClient:  c,
 		connection: websocketConn,

@@ -1,4 +1,4 @@
-package reconnect
+package persistent
 
 import (
 	"log"
@@ -28,7 +28,7 @@ func mustConnect(client web.Client, done chan struct{}) (ws realtime.Connection,
 	for {
 		ws, err = realtime.New(client).Dial()
 		if err == nil {
-			jot.Print("reconnect.mustConnect: websocket connected")
+			jot.Print("persistent.mustConnect: websocket connected")
 			ok = true
 			return
 		}
