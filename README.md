@@ -1,5 +1,9 @@
 # guac
 
+Guac is a client library for the Slack Web and Real Time APIs in Go. Use it for
+writing bots and other integrations. It's not complete but allows basic
+conversation via the real time API.
+
 ```
 go get github.com/doozr/guac
 ```
