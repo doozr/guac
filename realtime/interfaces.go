@@ -1,3 +1,5 @@
+// Package realtime contains a client for the Slack Real Time API that sends
+// and receives events via a websocket.
 package realtime
 
 // Event is the base interface to any Slack RealTime event.

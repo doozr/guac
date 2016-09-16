@@ -1,3 +1,5 @@
+// Package websocket contains a websocket dialer and connection for sending
+// and receiving JSON as raw bytes from the Slack API.
 package websocket
 
 // Connection sends and receives byte arrays to the Slack RealTime API.

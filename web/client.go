@@ -31,7 +31,7 @@ func (c client) Get(endPoint string, values url.Values) (response Response, err 
 	values.Add("token", c.token)
 	url := fmt.Sprintf("https://slack.com/api/%s?%s", endPoint, values.Encode())
 
-	jot.Print("Web GET: ", url)
+	jot.Print("web.client: GET ", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return
@@ -47,7 +47,7 @@ func (c client) Get(endPoint string, values url.Values) (response Response, err 
 	if err != nil {
 		return
 	}
-	jot.Printf("Web GET to %s received %s", url, string(bytes))
+	jot.Printf("web.client: GET %s received %s", url, string(bytes))
 
 	respObj := apiResponse{}
 	err = json.Unmarshal(bytes, &respObj)
@@ -66,14 +66,14 @@ func (c client) Post(endPoint string, values url.Values) (response Response, err
 	values.Add("token", c.token)
 
 	url := "https://slack.com/api/" + endPoint
-	jot.Printf("Web POST: %s with form values: %s", url, values.Encode())
+	jot.Printf("web.client: POST to %s with form values: %s", url, values.Encode())
 	resp, err := http.PostForm(url, values)
 	if err != nil {
 		return
 	}
 
 	if resp.StatusCode != 200 {
-		err = fmt.Errorf("API POST '%s' failed with code %d", endPoint, resp.StatusCode)
+		err = fmt.Errorf("POST to %s failed with code %d", endPoint, resp.StatusCode)
 		return
 	}
 
@@ -82,7 +82,7 @@ func (c client) Post(endPoint string, values url.Values) (response Response, err
 	if err != nil {
 		return
 	}
-	jot.Printf("Web POST to %s received %s", url, string(bytes))
+	jot.Printf("web.client: POST to %s received %s", url, string(bytes))
 
 	respObj := apiResponse{}
 	err = json.Unmarshal(bytes, &respObj)

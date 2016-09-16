@@ -26,9 +26,9 @@ func (d dialer) Dial() (conn Connection, err error) {
 	if err != nil {
 		return
 	}
-	jot.Print("Retrieved identity: ", id, name)
+	jot.Printf("websocket.dialer: received identity %s %s", id, name)
 
-	jot.Print("Dialing ", wsurl)
+	jot.Print("websocket.dialer: dialing ", wsurl)
 	ws, err := websocket.Dial(wsurl, "", "https://api.slack.com/")
 	if err != nil {
 		return

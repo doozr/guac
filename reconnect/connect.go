@@ -7,8 +7,13 @@ import (
 	"github.com/doozr/guac/realtime"
 	"github.com/doozr/guac/web"
 	"github.com/doozr/guac/websocket"
+	"github.com/doozr/jot"
 )
 
+// mustConnect gets a real time connection to Slack and retries infinitely on failure.
+//
+// Backs off retries from 1s, 2s, 5s, 10s, 30s and 1 minute, and retries at 1 minute
+// intervals after that. Close the `done` channel to stop retrying.
 func mustConnect(client web.Client, done chan struct{}) (r realtime.Connection, ok bool) {
 	backoffTimes := []time.Duration{
 		1 * time.Second,
@@ -25,6 +30,7 @@ func mustConnect(client web.Client, done chan struct{}) (r realtime.Connection, 
 	for {
 		ws, err = websocket.New(client).Dial()
 		if err == nil {
+			jot.Print("reconnect.mustConnect: websocket connected")
 			ok = true
 			r = realtime.New(ws)
 			return

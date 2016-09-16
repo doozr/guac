@@ -35,7 +35,7 @@ func (c connection) Send(payload []byte) (err error) {
 	}
 
 	// Force it to be a TextFrame by wrapping in string
-	jot.Print("Websocket sending: ", string(payload))
+	jot.Print("websocket.connection: sending ", string(payload))
 	err = websocket.Message.Send(c.websocket, string(payload))
 	if err != nil {
 		c.err = err
@@ -50,7 +50,7 @@ func (c connection) Receive() (payload []byte, err error) {
 	}
 
 	err = websocket.Message.Receive(c.websocket, &payload)
-	jot.Print("Websocket received: ", string(payload))
+	jot.Print("websocket.connection: received ", string(payload))
 	if err != nil {
 		c.err = err
 	}

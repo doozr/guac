@@ -1,3 +1,5 @@
+// Package web contains request formatting and response parsing for Slack
+// Web API calls.
 package web
 
 import "net/url"
