@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/doozr/guac/realtime"
 	"github.com/doozr/jot"
@@ -17,6 +18,7 @@ type reconnect struct {
 	dialer      realtime.Dialer
 	receiveChan chan []byte
 	sendChan    chan asyncEvent
+	timeout     time.Duration
 	done        chan struct{}
 	wg          *sync.WaitGroup
 }
@@ -27,11 +29,12 @@ type asyncEvent struct {
 }
 
 // New connection to the Slack RealTime API.
-func New(dialer realtime.Dialer) (conn realtime.Connection) {
+func New(dialer realtime.Dialer, timeout time.Duration) (conn realtime.Connection) {
 	reconn := &reconnect{
 		dialer:      dialer,
 		receiveChan: make(chan []byte),
 		sendChan:    make(chan asyncEvent),
+		timeout:     timeout,
 		done:        make(chan struct{}),
 		wg:          &sync.WaitGroup{},
 	}
@@ -83,7 +86,7 @@ func (c reconnect) run(ready chan struct{}) {
 			}
 
 			jot.Print("persistent.run: listening for events")
-			listen(r, c.receiveChan, c.sendChan, c.done)
+			listen(r, c.timeout, c.receiveChan, c.sendChan, c.done)
 		}
 	}
 }

@@ -1,7 +1,9 @@
 package persistent
 
 import (
+	"log"
 	"sync"
+	"time"
 
 	"github.com/doozr/guac/realtime"
 	"github.com/doozr/jot"
@@ -10,7 +12,7 @@ import (
 // listen for incoming and outgoing events and pass them to the active connection.
 //
 // Terminate by closing the `done` channel.
-func listen(r realtime.Connection,
+func listen(r realtime.Connection, timeout time.Duration,
 	receiveChan chan []byte, sendChan chan asyncEvent,
 	done chan struct{}) {
 
@@ -38,6 +40,10 @@ func listen(r realtime.Connection,
 		case asyncEv := <-sendChan:
 			err := r.Send(asyncEv.event)
 			asyncEv.callback <- err
+
+		case <-time.After(timeout):
+			log.Printf("connection timeout after %s: reconnecting", timeout)
+			return
 		}
 	}
 }

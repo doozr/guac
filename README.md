@@ -1,4 +1,4 @@
-# guac
+# Guac
 
 Guac is a client library for the Slack Web and Real Time APIs in Go. Use it for
 writing bots and other integrations. It's not complete but allows basic
@@ -18,11 +18,11 @@ their own name and channels via the API itself so none of that information is
 required.
 
 ```go
-slack := guac.New(token)
+client := guac.New(token)
 ```
 
-Connecting to the Real Time API is done via an existing web client and opens a
-websocket to communicate with the Slack service.
+Connecting to the Real Time API is done via an existing client instance, and
+opens a websocket to communicate with the Slack service.
 
 ```go
 rtm, err := guac.RealTime()
@@ -43,6 +43,8 @@ incoming messages from the Slack websocket.
 ```go
 rtm.Close()
 ```
+
+## Receiving Real Time Events
 
 Receive events via the `Receive()` method. All events are returned from the same
 function so the best way to handle them is with a type switch. this could call
@@ -76,11 +78,25 @@ func receiveEvents(rtm slack.RealTimeClient,
 }
 ```
 
-To force the `Receive()` method to stop listening, close the connection with the
-`Close()` method. This will force the `Receive()` method to return an error.
-Once an error is received from the Receive method, it is considered terminal.
-Further calls will return the same error. At this point, create a new connection
-with `WebClient.RealTime()`.
+Close the connection with the `Close()` method to stop the `Receive()` method
+listening. This will force the `Receive()` method to return an error. Once an
+error is received from the Receive method, it is considered terminal. Further
+calls will return the same error. At this point, create a new connection with
+`WebClient.RealTime()`.
+
+## Ping Pong
+
+It is recommended to send a Ping request via the `RealTimeClient.Ping()` method
+periodically to let Slack know you are still there. It will result in a pong
+response returned by the `Receive()` method.
+
+This means that, at a minimum, you should expect a message from Slack at least
+as frequently as your pings. If there is no incoming message for a significant
+period, it may be that the connection has hung and should be reconnected.
+
+The PersistentRealTime connection accepts a duration to be considered "inactive"
+and will reconnect if that timeout is exceeded between messages. It does not
+send ping requests of its own; they must still be sent.
 
 ## Limitations
 
