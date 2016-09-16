@@ -12,7 +12,7 @@ Use:
 import "github.com/doozr/guac"
 ```
 
-
+Package guac contains a client for the Slack Web and Real Time APIs in Go.
 
 ## Usage
 
@@ -57,6 +57,7 @@ PingPongEvent is a ping and also the reciprocal pong.
 
 ```go
 type RealTimeClient struct {
+	WebClient
 }
 ```
 
@@ -74,6 +75,20 @@ Subsequent calls after an error will result in the same error.
 func (g RealTimeClient) Close()
 ```
 Close terminates the connection.
+
+#### func (RealTimeClient) ID
+
+```go
+func (g RealTimeClient) ID() string
+```
+ID of the bot
+
+#### func (RealTimeClient) Name
+
+```go
+func (g RealTimeClient) Name() string
+```
+Name of the bot
 
 #### func (RealTimeClient) Ping
 
@@ -172,6 +187,16 @@ IMOpen opens or returns an IM channel with a specified user.
 
 If an IM with the specified user already exists and is not archived it is
 returned, otherwise a new IM channel is opened with that user.
+
+#### func (WebClient) PersistentRealTime
+
+```go
+func (c WebClient) PersistentRealTime() (client RealTimeClient, err error)
+```
+PersistentRealTime connects to the Slack RealTime API using the Web client's
+credentials and reconnects whenever the connection drops.
+
+The only way to stop it reconnecting is to use RealTimeClient.Close()
 
 #### func (WebClient) RealTime
 

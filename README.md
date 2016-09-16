@@ -21,7 +21,23 @@ Connecting to the Real Time API is done via an existing web client and opens a
 websocket to communicate with the Slack service.
 
 ```go
-rtm, err := slack.RealTime()
+rtm, err := guac.RealTime()
+```
+
+Alternatively, if you don't want to have to handle connection failures and
+reconnections yourself, use the persistent connection option and have it all
+happen behind the scenes. Outgoing messages and incoming requests are queued
+if the connection drops.
+
+```go
+rtm, err := guac.PersistentRealTime()
+```
+
+Close connections when they're done to clean up any goroutines that are handling
+incoming messages from the Slack websocket.
+
+```go
+rtm.Close()
 ```
 
 Receive events via the `Receive()` method. All events are returned from the same

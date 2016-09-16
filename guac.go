@@ -1,4 +1,4 @@
-// Package guac contains an client for the Slack Web and Real Time APIs in Go.
+// Package guac contains a client for the Slack Web and Real Time APIs in Go.
 package guac
 
 import "github.com/doozr/guac/web"
