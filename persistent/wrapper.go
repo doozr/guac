@@ -118,7 +118,7 @@ func (c reconnect) Send(raw []byte) (err error) {
 		callback: callback,
 	}
 
-	jot.Print("persistent.Send sending async event: ", a)
+	jot.Print("persistent.Send sending async event: ", string(raw))
 	c.sendChan <- a
 
 	jot.Print("persistent.Send awaiting callback")
