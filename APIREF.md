@@ -72,28 +72,28 @@ Subsequent calls after an error will result in the same error.
 #### func (RealTimeClient) Close
 
 ```go
-func (g RealTimeClient) Close()
+func (c RealTimeClient) Close()
 ```
 Close terminates the connection.
 
 #### func (RealTimeClient) ID
 
 ```go
-func (g RealTimeClient) ID() string
+func (c RealTimeClient) ID() string
 ```
 ID of the bot
 
 #### func (RealTimeClient) Name
 
 ```go
-func (g RealTimeClient) Name() string
+func (c RealTimeClient) Name() string
 ```
 Name of the bot
 
 #### func (RealTimeClient) Ping
 
 ```go
-func (g RealTimeClient) Ping() (err error)
+func (c RealTimeClient) Ping() (err error)
 ```
 Ping sends a ping request.
 
@@ -102,7 +102,7 @@ Sends a bare ping with no additional information.
 #### func (RealTimeClient) PostMessage
 
 ```go
-func (g RealTimeClient) PostMessage(channel, text string) (err error)
+func (c RealTimeClient) PostMessage(channel, text string) (err error)
 ```
 PostMessage sends a chat message to the given channel.
 
@@ -112,13 +112,14 @@ identity of a user. Use the API formatting standard.
 #### func (RealTimeClient) Receive
 
 ```go
-func (g RealTimeClient) Receive() (event interface{}, err error)
+func (c RealTimeClient) Receive() chan interface{}
 ```
-Receive an event from the Slack RealTime API.
+Receive an channel of events from the Slack RealTime API.
 
-Receive one of the concrete event types and return it. The event should be
-checked with a type assertion to determine its type. If a message of an as-yet
-unsupported type arrives it will be ignored.
+Events should be checked with a type assertion to determine their type. If a
+message of an as-yet unsupported type arrives it will be ignored.
+
+Multiple calls to Receive will return the same channel.
 
 #### type UserChangeEvent
 
@@ -191,12 +192,15 @@ returned, otherwise a new IM channel is opened with that user.
 #### func (WebClient) PersistentRealTime
 
 ```go
-func (c WebClient) PersistentRealTime() (client RealTimeClient, err error)
+func (c WebClient) PersistentRealTime(timeout time.Duration) (client RealTimeClient, err error)
 ```
 PersistentRealTime connects to the Slack RealTime API using the Web client's
 credentials and reconnects whenever the connection drops.
 
-The only way to stop it reconnecting is to use RealTimeClient.Close()
+The only way to stop it reconnecting is to use RealTimeClient.Close().
+
+The timeout parameter is the time after which an open connection is considered
+inactive. If this timeout is hit the client will reconnect automatically.
 
 #### func (WebClient) RealTime
 

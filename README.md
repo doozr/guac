@@ -18,23 +18,24 @@ their own name and channels via the API itself so none of that information is
 required.
 
 ```go
-client := guac.New(token)
+webClient := guac.New(token)
 ```
 
 Connecting to the Real Time API is done via an existing client instance, and
 opens a websocket to communicate with the Slack service.
 
 ```go
-rtm, err := guac.RealTime()
+rtm, err := webClient.RealTime()
 ```
 
 Alternatively, if you don't want to have to handle connection failures and
 reconnections yourself, use the persistent connection option and have it all
 happen behind the scenes. Outgoing messages and incoming requests are queued
-if the connection drops.
+if the connection drops. A timeout period must be specified that will be used to
+determine if the websocket has "hung" and needs restarting.
 
 ```go
-rtm, err := guac.PersistentRealTime()
+rtm, err := webClient.PersistentRealTime(5 * time.Minute)
 ```
 
 Close connections when they're done to clean up any goroutines that are handling
@@ -58,14 +59,9 @@ func receiveEvents(rtm slack.RealTimeClient,
     for {
         select {
         case <-done:
+            rtm.Close()
             return
-        default:
-            e, err := rtm.Receive()
-            if err != nil {
-                // Cannot continue with this instance
-                return
-            }
-
+        case e := <-rtm.Receive():
             switch event := e.(type) {
             case MessageEvent:
                 messages <- event
@@ -79,10 +75,10 @@ func receiveEvents(rtm slack.RealTimeClient,
 ```
 
 Close the connection with the `Close()` method to stop the `Receive()` method
-listening. This will force the `Receive()` method to return an error. Once an
-error is received from the Receive method, it is considered terminal. Further
-calls will return the same error. At this point, create a new connection with
-`WebClient.RealTime()`.
+listening. This will force the `Receive()` method to close its channel. The
+`Receive()` method will close its channel if an error is received. This is
+considered terminal and further calls to receive will immediately return closed
+channels. At this point, create a new connection.
 
 ## Ping Pong
 
@@ -95,7 +91,7 @@ as frequently as your pings. If there is no incoming message for a significant
 period, it may be that the connection has hung and should be reconnected.
 
 The PersistentRealTime connection accepts a duration to be considered "inactive"
-and will reconnect if that timeout is exceeded between messages. Not that it
+and will reconnect if that timeout is exceeded between messages. Note that it
 does not send ping requests; it only times out if nothing comes back. Make sure
 pings are being sent to prevent timeout.
 

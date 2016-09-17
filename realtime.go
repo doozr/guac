@@ -29,17 +29,17 @@ type RealTimeClient struct {
 }
 
 // ID of the bot
-func (c *RealTimeClient) ID() string {
+func (c RealTimeClient) ID() string {
 	return c.connection.ID()
 }
 
 // Name of the bot
-func (c *RealTimeClient) Name() string {
+func (c RealTimeClient) Name() string {
 	return c.connection.Name()
 }
 
 // Close terminates the connection.
-func (c *RealTimeClient) Close() {
+func (c RealTimeClient) Close() {
 	c.connection.Close()
 }
 
@@ -47,7 +47,7 @@ func (c *RealTimeClient) Close() {
 //
 // The message is posted as the bot itself, and does not try to take on the
 // identity of a user. Use the API formatting standard.
-func (c *RealTimeClient) PostMessage(channel, text string) (err error) {
+func (c RealTimeClient) PostMessage(channel, text string) (err error) {
 	id := nextID()
 	m := MessageEvent{
 		Type:    "message",
@@ -66,7 +66,7 @@ func (c *RealTimeClient) PostMessage(channel, text string) (err error) {
 // Ping sends a ping request.
 //
 // Sends a bare ping with no additional information.
-func (c *RealTimeClient) Ping() (err error) {
+func (c RealTimeClient) Ping() (err error) {
 	id := nextID()
 	m := PingPongEvent{
 		Type: "ping",
@@ -79,12 +79,13 @@ func (c *RealTimeClient) Ping() (err error) {
 	return
 }
 
-//Receive an event from the Slack RealTime API.
+//Receive an channel of events from the Slack RealTime API.
 //
-//Receive one of the concrete event types and return it. The event should be
-//checked with a type assertion to determine its type. If a message of an
-//as-yet unsupported type arrives it will be ignored.
-func (c *RealTimeClient) Receive() chan interface{} {
+//Events should be checked with a type assertion to determine their type. If a
+//message of an as-yet unsupported type arrives it will be ignored.
+//
+// Multiple calls to Receive will return the same channel.
+func (c RealTimeClient) Receive() chan interface{} {
 	if c.receiveChan != nil {
 		jot.Print("realtimeclient.Receive already running")
 		return c.receiveChan

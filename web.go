@@ -16,7 +16,8 @@ type WebClient struct {
 	client web.Client
 }
 
-// RealTime connects to the Slack RealTime API using the Web client's credentials.
+// RealTime connects to the Slack RealTime API using the Web client's
+// credentials.
 //
 // The returned object represents a websocket connection that remains open
 // between calls until the Close method is called.
@@ -33,13 +34,14 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 	return
 }
 
-// PersistentRealTime connects to the Slack RealTime API using the Web client's credentials
-// and reconnects whenever the connection drops.
+// PersistentRealTime connects to the Slack RealTime API using the Web client's
+// credentials and reconnects whenever the connection drops.
 //
 // The only way to stop it reconnecting is to use RealTimeClient.Close().
 //
-// The timeout parameter is the time after which an open connection is considered
-// inactive. If this timeout is hit the client will reconnect.
+// The timeout parameter is the time after which an open connection is
+// considered inactive. If this timeout is hit the client will reconnect
+// automatically.
 func (c WebClient) PersistentRealTime(timeout time.Duration) (client RealTimeClient, err error) {
 	dialer := realtime.New(c.client)
 	websocketConn := persistent.New(dialer, timeout)
