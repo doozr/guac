@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 
 	"github.com/doozr/guac/realtime"
+	"github.com/doozr/jot"
 )
 
 var counter uint64
@@ -23,29 +24,30 @@ func nextID() uint64 {
 // Subsequent calls after an error will result in the same error.
 type RealTimeClient struct {
 	WebClient
-	connection realtime.Connection
+	connection  realtime.Connection
+	receiveChan chan interface{}
 }
 
 // ID of the bot
-func (g RealTimeClient) ID() string {
-	return g.connection.ID()
+func (c *RealTimeClient) ID() string {
+	return c.connection.ID()
 }
 
 // Name of the bot
-func (g RealTimeClient) Name() string {
-	return g.connection.Name()
+func (c *RealTimeClient) Name() string {
+	return c.connection.Name()
 }
 
 // Close terminates the connection.
-func (g RealTimeClient) Close() {
-	g.connection.Close()
+func (c *RealTimeClient) Close() {
+	c.connection.Close()
 }
 
 // PostMessage sends a chat message to the given channel.
 //
 // The message is posted as the bot itself, and does not try to take on the
 // identity of a user. Use the API formatting standard.
-func (g RealTimeClient) PostMessage(channel, text string) (err error) {
+func (c *RealTimeClient) PostMessage(channel, text string) (err error) {
 	id := nextID()
 	m := MessageEvent{
 		Type:    "message",
@@ -56,7 +58,7 @@ func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 	}
 	payload, err := json.Marshal(m)
 	if err == nil {
-		err = g.connection.Send(payload)
+		err = c.connection.Send(payload)
 	}
 	return
 }
@@ -64,7 +66,7 @@ func (g RealTimeClient) PostMessage(channel, text string) (err error) {
 // Ping sends a ping request.
 //
 // Sends a bare ping with no additional information.
-func (g RealTimeClient) Ping() (err error) {
+func (c *RealTimeClient) Ping() (err error) {
 	id := nextID()
 	m := PingPongEvent{
 		Type: "ping",
@@ -72,7 +74,7 @@ func (g RealTimeClient) Ping() (err error) {
 	}
 	payload, err := json.Marshal(m)
 	if err == nil {
-		err = g.connection.Send(payload)
+		err = c.connection.Send(payload)
 	}
 	return
 }
@@ -82,20 +84,42 @@ func (g RealTimeClient) Ping() (err error) {
 //Receive one of the concrete event types and return it. The event should be
 //checked with a type assertion to determine its type. If a message of an
 //as-yet unsupported type arrives it will be ignored.
-func (g RealTimeClient) Receive() (event interface{}, err error) {
-	var raw []byte
-	for {
-		// Bail out on error immediately
-		raw, err = g.connection.Receive()
-		if err != nil {
-			break
-		}
-
-		// Only return if there is something worth returning, or an error
-		event, err = convertEvent(raw)
-		if event != nil || err != nil {
-			break
-		}
+func (c *RealTimeClient) Receive() chan interface{} {
+	if c.receiveChan != nil {
+		jot.Print("realtimeclient.Receive already running")
+		return c.receiveChan
 	}
-	return
+
+	jot.Print("realtimeclient.Receive started")
+	c.receiveChan = make(chan interface{})
+
+	go func() {
+		defer func() {
+			close(c.receiveChan)
+			c.receiveChan = nil
+			jot.Print("realtime.Receive done")
+		}()
+
+		for {
+			// Bail out on error immediately
+			raw, err := c.connection.Receive()
+			if err != nil {
+				jot.Print("realtimeclient.Receive error from realtime.Receive: ", err)
+				return
+			}
+
+			// Only return if there is something worth returning, or an error
+			event, err := convertEvent(raw)
+			if err != nil {
+				jot.Print("realtimeclient.Receive error converting event: ", err)
+				return
+			}
+
+			//
+			if event != nil {
+				c.receiveChan <- event
+			}
+		}
+	}()
+	return c.receiveChan
 }

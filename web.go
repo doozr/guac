@@ -65,7 +65,7 @@ func (c WebClient) UsersList() (users []UserInfo, err error) {
 	}
 
 	userList := struct {
-		Users []UserInfo `json:"users"`
+		Users []UserInfo `json:"members"`
 	}{}
 
 	err = json.Unmarshal(response.Payload(), &userList)
