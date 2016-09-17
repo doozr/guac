@@ -4,6 +4,9 @@ Guac is a client library for the Slack Web and Real Time APIs in Go. Use it for
 writing bots and other integrations. It's not complete but allows basic
 conversation via the real time API.
 
+The name comes from a phonetically mangled portmanteau of "Go" and "Slack"
+combined with my love of Mexican food.
+
 ```
 go get github.com/doozr/guac
 ```
@@ -54,8 +57,8 @@ handlers, push the events onto channels, or anything else.
 ```go
 func receiveEvents(rtm slack.RealTimeClient,
                    done chan struct{},
-                   messages chan MessageEvent,
-                   userChanges chan UserChangeEvent) {
+                   messages chan guac.MessageEvent,
+                   userChanges chan guac.UserChangeEvent) {
     for {
         select {
         case <-done:
@@ -63,9 +66,9 @@ func receiveEvents(rtm slack.RealTimeClient,
             return
         case e := <-rtm.Receive():
             switch event := e.(type) {
-            case MessageEvent:
+            case guac.MessageEvent:
                 messages <- event
-            case UserChangeEvent:
+            case guac.UserChangeEvent:
                 userChanges <- event
             default:
                 // Unhandled
