@@ -1,6 +1,6 @@
 # Guac
 
-![Guac](guac.png){:style="width: 180px; float: right;margin: 16px"}
+<img align="right" width="180" style="margin: 12px" src="guac.png">
 Guac is a client library for the Slack Web and Real Time APIs in Go. Use it for
 writing bots and other integrations. It's not complete but allows basic
 conversation via the real time API.
