@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.2" width="38.62mm" height="64.02mm" viewBox="7325 9864 3862 6402" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:ooo="http://xml.openoffice.org/svg/export" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:presentation="http://sun.com/xmlns/staroffice/presentation" xmlns:smil="http://www.w3.org/2001/SMIL20/" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xml:space="preserve">
+  <rect class="BoundingBox" stroke="none" fill="none" x="7324" y="9864" width="3864" height="6404"/>
+  <path fill="rgb(174,207,0)" stroke="none" d="M 9255,9890 C 10335,9890 11160,11265 11160,13065 11160,14865 9763,15097 9255,15097 8747,15097 7350,14865 7350,13065 7350,11265 8175,9890 9255,9890 Z M 7350,9890 L 7350,9890 Z M 11161,16241 L 11161,16241 Z"/>
+  <path fill="none" stroke="rgb(87,157,28)" stroke-width="51" stroke-linejoin="round" d="M 9255,9890 C 10335,9890 11160,11265 11160,13065 11160,14865 9763,15097 9255,15097 8747,15097 7350,14865 7350,13065 7350,11265 8175,9890 9255,9890 Z"/>
+  <rect class="BoundingBox" stroke="none" fill="none" x="8339" y="11896" width="1705" height="2594"/>
+  <path fill="rgb(255,149,14)" stroke="none" d="M 9190,11922 C 9658,11922 10016,12472 10016,13192 10016,13912 9658,14462 9190,14462 8722,14462 8365,13912 8365,13192 8365,12472 8722,11922 9190,11922 Z M 8365,11922 L 8365,11922 Z M 10017,14463 L 10017,14463 Z"/>
+  <path fill="none" stroke="rgb(126,0,33)" stroke-width="51" stroke-linejoin="round" d="M 9190,11922 C 9658,11922 10016,12472 10016,13192 10016,13912 9658,14462 9190,14462 8722,14462 8365,13912 8365,13192 8365,12472 8722,11922 9190,11922 Z"/>
+</svg>
