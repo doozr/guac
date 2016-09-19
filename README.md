@@ -1,6 +1,6 @@
 # Guac
 
-<img align="right" width="180" style="margin: 12px" src="guac.svg">
+<img align="right" width="180" style="margin: 12px" src="https://cdn.rawgit.com/doozr/guac/master/guac.svg">
 Guac is a client library for the Slack Web and Real Time APIs in Go. Use it for
 writing bots and other integrations. It's not complete but allows basic
 conversation via the real time API.
