@@ -24,8 +24,7 @@ func nextID() uint64 {
 // Subsequent calls after an error will result in the same error.
 type RealTimeClient struct {
 	WebClient
-	connection  realtime.Connection
-	receiveChan chan interface{}
+	connection realtime.Connection
 }
 
 // ID of the bot
@@ -79,25 +78,20 @@ func (c RealTimeClient) Ping() (err error) {
 	return
 }
 
-//Receive an channel of events from the Slack RealTime API.
+//Receive an channel to receive a single event from the Slack RealTime API.
 //
 //Events should be checked with a type assertion to determine their type. If a
 //message of an as-yet unsupported type arrives it will be ignored.
 //
-// Multiple calls to Receive will return the same channel.
-func (c RealTimeClient) Receive() chan interface{} {
-	if c.receiveChan != nil {
-		jot.Print("realtimeclient.Receive already running")
-		return c.receiveChan
-	}
-
+// Multiple calls to Receive will return new channels. Be aware than this could
+// result in messages being split amongst listeners.
+func (c RealTimeClient) Receive() (receiveChan chan interface{}) {
 	jot.Print("realtimeclient.Receive started")
-	c.receiveChan = make(chan interface{})
+	receiveChan = make(chan interface{})
 
 	go func() {
 		defer func() {
-			close(c.receiveChan)
-			c.receiveChan = nil
+			close(receiveChan)
 			jot.Print("realtime.Receive done")
 		}()
 
@@ -108,6 +102,7 @@ func (c RealTimeClient) Receive() chan interface{} {
 				jot.Print("realtimeclient.Receive error from realtime.Receive: ", err)
 				return
 			}
+			jot.Print("realtime.Receive raw ", string(raw))
 
 			// Only return if there is something worth returning, or an error
 			event, err := convertEvent(raw)
@@ -115,12 +110,14 @@ func (c RealTimeClient) Receive() chan interface{} {
 				jot.Print("realtimeclient.Receive error converting event: ", err)
 				return
 			}
+			jot.Print("realtime.Receive event ", event)
 
-			//
 			if event != nil {
-				c.receiveChan <- event
+				jot.Print("realtime.Receive sent event ", event)
+				receiveChan <- event
+				return
 			}
 		}
 	}()
-	return c.receiveChan
+	return receiveChan
 }
