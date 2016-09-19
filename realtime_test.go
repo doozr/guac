@@ -22,7 +22,9 @@ func (c TestRealTimeConnection) Name() string {
 }
 
 func (c TestRealTimeConnection) Close() {
-	close(c.closed)
+	if c.closed != nil {
+		close(c.closed)
+	}
 }
 
 func (c TestRealTimeConnection) Send(event []byte) error {
@@ -80,6 +82,8 @@ func receiveEvent(t *testing.T, eventType string, payload string, expected inter
 	if !reflect.DeepEqual(expected, event) {
 		t.Fatal("Event did not match", expected, event)
 	}
+
+	realTime.Close()
 }
 
 func TestReceivePong(t *testing.T) {
