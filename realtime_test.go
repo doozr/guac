@@ -66,13 +66,8 @@ func TestClosed(t *testing.T) {
 
 func receiveEvent(t *testing.T, eventType string, payload string, expected interface{}) {
 	bytes := []byte(payload)
-	called := false
 	realTimeConnection := TestRealTimeConnection{
 		receive: func() ([]byte, error) {
-			if called {
-				t.Fatal("RealTimeConnection.Receive called more than once")
-			}
-			called = true
 			return bytes, nil
 		},
 	}
@@ -117,7 +112,7 @@ func TestReceiveMessage(t *testing.T) {
 		})
 }
 
-func TestReceiveUserChance(t *testing.T) {
+func TestReceiveUserChange(t *testing.T) {
 	receiveEvent(t, "user_change",
 		`{
 			"type": "user_change",
