@@ -55,7 +55,7 @@ func New(dialer realtime.Dialer, timeout time.Duration) (conn realtime.Connectio
 // create a new one. Repeat ad infinitum.
 //
 // Terminate by closing the `c.done` channel and waiting on `c.wg`.
-func (c reconnect) run(ready chan struct{}) {
+func (c *reconnect) run(ready chan struct{}) {
 	jot.Print("persistent.run: started")
 	defer func() {
 		jot.Print("persistent.run: done")
@@ -75,7 +75,7 @@ func (c reconnect) run(ready chan struct{}) {
 			// If we are connected, set the ID and name
 			c.id = r.ID()
 			c.name = r.Name()
-			log.Print("Connected as ", r.Name())
+			log.Printf("persistent.run: got identity %s %s", c.id, c.name)
 
 			// Only close ready if it's open
 			select {
@@ -92,17 +92,19 @@ func (c reconnect) run(ready chan struct{}) {
 }
 
 // ID of the connected bot.
-func (c reconnect) ID() string {
+func (c *reconnect) ID() string {
+	jot.Print("persistent.id is ", c.id)
 	return c.id
 }
 
 // Name of the connected bot.
-func (c reconnect) Name() string {
+func (c *reconnect) Name() string {
+	jot.Print("persistent.name is ", c.name)
 	return c.name
 }
 
 // Close the persistent connection loop immediately.
-func (c reconnect) Close() {
+func (c *reconnect) Close() {
 	jot.Print("persistent.wrapper: closing down connections")
 	close(c.done)
 	c.wg.Wait()
@@ -113,7 +115,7 @@ func (c reconnect) Close() {
 }
 
 // Send an asynchronous event and wait for confirmation.
-func (c reconnect) Send(raw []byte) (err error) {
+func (c *reconnect) Send(raw []byte) (err error) {
 	callback := make(chan error)
 	a := asyncEvent{
 		event:    raw,
@@ -132,7 +134,7 @@ func (c reconnect) Send(raw []byte) (err error) {
 }
 
 // Receive an incoming event.
-func (c reconnect) Receive() (raw []byte, err error) {
+func (c *reconnect) Receive() (raw []byte, err error) {
 	jot.Print("persistent.Receive: awaiting event")
 	raw, ok := <-c.receiveChan
 	if !ok {
