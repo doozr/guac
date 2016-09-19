@@ -75,7 +75,7 @@ func (c reconnect) run(ready chan struct{}) {
 			// If we are connected, set the ID and name
 			c.id = r.ID()
 			c.name = r.Name()
-			log.Print("persistent.run: connected as ", r.Name())
+			log.Print("Connected as ", r.Name())
 
 			// Only close ready if it's open
 			select {
