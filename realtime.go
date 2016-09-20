@@ -78,46 +78,30 @@ func (c RealTimeClient) Ping() (err error) {
 	return
 }
 
-//Receive an channel to receive a single event from the Slack RealTime API.
+// Receive an event or an error.
 //
-//Events should be checked with a type assertion to determine their type. If a
-//message of an as-yet unsupported type arrives it will be ignored.
-//
-// Multiple calls to Receive will return new channels. Be aware than this could
-// result in messages being split amongst listeners.
-func (c RealTimeClient) Receive() (receiveChan chan interface{}) {
-	jot.Print("realtimeclient.Receive started")
-	receiveChan = make(chan interface{})
-
-	go func() {
-		defer func() {
-			close(receiveChan)
-			jot.Print("realtime.Receive done")
-		}()
-
-		for {
-			// Bail out on error immediately
-			raw, err := c.connection.Receive()
-			if err != nil {
-				jot.Print("realtimeclient.Receive error from realtime.Receive: ", err)
-				return
-			}
-			jot.Print("realtime.Receive raw ", string(raw))
-
-			// Only return if there is something worth returning, or an error
-			event, err := convertEvent(raw)
-			if err != nil {
-				jot.Print("realtimeclient.Receive error converting event: ", err)
-				return
-			}
-			jot.Print("realtime.Receive event ", event)
-
-			if event != nil {
-				jot.Print("realtime.Receive sent event ", event)
-				receiveChan <- event
-				return
-			}
+// Blocks until an known event type arrives or an error occurs.
+func (c RealTimeClient) Receive() (event interface{}, err error) {
+	var raw []byte
+	for {
+		// Bail out on error immediately
+		raw, err = c.connection.Receive()
+		if err != nil {
+			jot.Print("realtimeclient.Receive error from realtime.Receive: ", err)
+			return
 		}
-	}()
-	return receiveChan
+		jot.Print("realtime.Receive raw ", string(raw))
+
+		// Only return if there is something worth returning, or an error
+		event, err = convertEvent(raw)
+		if err != nil {
+			jot.Print("realtimeclient.Receive error converting event: ", err)
+			return
+		}
+
+		if event != nil {
+			jot.Print("realtime.Receive event ", event)
+			return
+		}
+	}
 }
