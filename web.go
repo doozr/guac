@@ -42,7 +42,7 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 // The timeout parameter is the time after which an open connection is
 // considered inactive. If this timeout is hit the client will reconnect
 // automatically.
-func (c WebClient) PersistentRealTime(timeout time.Duration) (client RealTimeClient, err error) {
+func (c WebClient) persistentRealTime(timeout time.Duration) (client RealTimeClient, err error) {
 	dialer := realtime.New(c.client)
 	websocketConn := persistent.New(dialer, timeout)
 	client = RealTimeClient{

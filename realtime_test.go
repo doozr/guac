@@ -78,7 +78,11 @@ func receiveEvent(t *testing.T, eventType string, payload string, expected inter
 		connection: realTimeConnection,
 	}
 
-	event := <-realTime.Receive()
+	event, err := realTime.Receive()
+	if err != nil {
+		t.Fatal("Unexpected error ", err)
+	}
+
 	if !reflect.DeepEqual(expected, event) {
 		t.Fatal("Event did not match", expected, event)
 	}
@@ -151,7 +155,11 @@ func TestDoesNotReturnUnknown(t *testing.T) {
 		connection: realTimeConnection,
 	}
 
-	event := <-realTime.Receive()
+	event, err := realTime.Receive()
+	if err != nil {
+		t.Fatal("Unexpected error ", err)
+	}
+
 	if _, ok := event.(PingPongEvent); !ok {
 		t.Fatal("Expected RealTimePing instance", event)
 	}
@@ -164,11 +172,15 @@ func TestReceiveError(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{
+	realTimeClient := RealTimeClient{
 		connection: realTimeConnection,
 	}
 
-	event := <-rtm.Receive()
+	event, err := realTimeClient.Receive()
+	if err == nil {
+		t.Fatal("Expected error ", err)
+	}
+
 	if event != nil {
 		t.Fatal("Expected nil event", event)
 	}

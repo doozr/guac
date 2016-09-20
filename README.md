@@ -32,16 +32,6 @@ opens a websocket to communicate with the Slack service.
 rtm, err := webClient.RealTime()
 ```
 
-Alternatively, if you don't want to have to handle connection failures and
-reconnections yourself, use the persistent connection option and have it all
-happen behind the scenes. Outgoing messages and incoming requests are queued
-if the connection drops. A timeout period must be specified that will be used to
-determine if the websocket has "hung" and needs restarting.
-
-```go
-rtm, err := webClient.PersistentRealTime(5 * time.Minute)
-```
-
 Close connections when they're done to clean up any goroutines that are handling
 incoming messages from the Slack websocket.
 
@@ -60,12 +50,19 @@ func receiveEvents(rtm slack.RealTimeClient,
                    done chan struct{},
                    messages chan guac.MessageEvent,
                    userChanges chan guac.UserChangeEvent) {
+    defer func() {
+        rtm.Close()
+    }()
     for {
         select {
         case <-done:
-            rtm.Close()
             return
-        case e := <-rtm.Receive():
+        default:
+            e, err := rtm.Receive()
+            if err != nil {
+                // log the error
+                return
+            }
             switch event := e.(type) {
             case guac.MessageEvent:
                 messages <- event
@@ -79,10 +76,8 @@ func receiveEvents(rtm slack.RealTimeClient,
 ```
 
 Close the connection with the `Close()` method to stop the `Receive()` method
-listening. This will force the `Receive()` method to close its channel. The
-`Receive()` method will close its channel if an error is received. This is
-considered terminal and further calls to receive will immediately return closed
-channels. At this point, create a new connection.
+listening. If an error is received from `Receive()` method it is  considered
+terminal. At this point, create a new connection or restart the program.
 
 ## Ping Pong
 

@@ -15,6 +15,7 @@ import (
 func listen(r realtime.Connection, timeout time.Duration,
 	receiveChan chan []byte, sendChan chan asyncEvent, done chan struct{}) {
 
+	jot.Print("persistent.listen: started")
 	wg := sync.WaitGroup{}
 	events := receive(r, done, &wg)
 	send(r, sendChan, done, &wg)
@@ -24,6 +25,7 @@ func listen(r realtime.Connection, timeout time.Duration,
 
 		// Close the connection to stop waiting websockets immediately
 		r.Close()
+		jot.Print("persistent.listen: connection closed")
 
 		wg.Wait()
 		jot.Print("persistent.listen: done")
@@ -32,6 +34,7 @@ func listen(r realtime.Connection, timeout time.Duration,
 	for {
 		select {
 		case <-done:
+			jot.Print("persistent.listen: done channel closed")
 			return
 
 		case event, ok := <-events:
