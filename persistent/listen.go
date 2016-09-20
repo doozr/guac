@@ -34,7 +34,11 @@ func listen(r realtime.Connection, timeout time.Duration,
 		case <-done:
 			return
 
-		case event := <-events:
+		case event, ok := <-events:
+			if !ok {
+				log.Print("connection closed: reconnecting")
+				return
+			}
 			receiveChan <- event
 
 		case <-time.After(timeout):
@@ -95,6 +99,12 @@ func receive(r realtime.Connection, done chan struct{}, wg *sync.WaitGroup) (eve
 					jot.Print("persistent.receive: error while receiving events: ", err)
 					return
 				}
+
+				if event == nil {
+					jot.Print("persistent.receive: received nil event")
+					return
+				}
+
 				events <- event
 			}
 		}
