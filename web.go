@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"time"
 
-	"github.com/doozr/guac/persistent"
 	"github.com/doozr/guac/realtime"
 	"github.com/doozr/guac/web"
 )
@@ -27,24 +25,6 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 		return
 	}
 
-	client = RealTimeClient{
-		WebClient:  c,
-		connection: websocketConn,
-	}
-	return
-}
-
-// PersistentRealTime connects to the Slack RealTime API using the Web client's
-// credentials and reconnects whenever the connection drops.
-//
-// The only way to stop it reconnecting is to use RealTimeClient.Close().
-//
-// The timeout parameter is the time after which an open connection is
-// considered inactive. If this timeout is hit the client will reconnect
-// automatically.
-func (c WebClient) persistentRealTime(timeout time.Duration) (client RealTimeClient, err error) {
-	dialer := realtime.New(c.client)
-	websocketConn := persistent.New(dialer, timeout)
 	client = RealTimeClient{
 		WebClient:  c,
 		connection: websocketConn,
