@@ -9,8 +9,8 @@ import (
 	"github.com/doozr/guac/web"
 )
 
-// WebClient is an interface to the Slack Web API.
-type WebClient struct {
+// Default implementation of WebClient
+type webClient struct {
 	client web.Client
 }
 
@@ -19,13 +19,13 @@ type WebClient struct {
 //
 // The returned object represents a websocket connection that remains open
 // between calls until the Close method is called.
-func (c WebClient) RealTime() (client RealTimeClient, err error) {
+func (c *webClient) RealTime() (client RealTimeClient, err error) {
 	websocketConn, err := realtime.New(c.client).Dial()
 	if err != nil {
 		return
 	}
 
-	client = RealTimeClient{
+	client = &realTimeClient{
 		WebClient:  c,
 		connection: websocketConn,
 	}
@@ -35,7 +35,7 @@ func (c WebClient) RealTime() (client RealTimeClient, err error) {
 // UsersList returns a list of user information.
 //
 // All users are returned, including deleted and deactivated users.
-func (c WebClient) UsersList() (users []UserInfo, err error) {
+func (c *webClient) UsersList() (users []UserInfo, err error) {
 	response, err := c.client.Get("users.list", nil)
 	if err != nil {
 		return
@@ -63,7 +63,7 @@ func (c WebClient) UsersList() (users []UserInfo, err error) {
 //
 // All channels, including archived channels, are returned excluding private
 // channels. Use GroupsList to retrieve private channels.
-func (c WebClient) ChannelsList() (channels []ChannelInfo, err error) {
+func (c *webClient) ChannelsList() (channels []ChannelInfo, err error) {
 	response, err := c.client.Get("channels.list", nil)
 	if err != nil {
 		return
@@ -90,7 +90,7 @@ func (c WebClient) ChannelsList() (channels []ChannelInfo, err error) {
 // GroupsList gets a list of private channel information.
 //
 // All private channels, but not single or multi-user IMs.
-func (c WebClient) GroupsList() (channels []ChannelInfo, err error) {
+func (c *webClient) GroupsList() (channels []ChannelInfo, err error) {
 	response, err := c.client.Get("groups.list", nil)
 	if err != nil {
 		return
@@ -118,7 +118,7 @@ func (c WebClient) GroupsList() (channels []ChannelInfo, err error) {
 //
 // If an IM with the specified user already exists and is not archived it is
 // returned, otherwise a new IM channel is opened with that user.
-func (c WebClient) IMOpen(user string) (channel string, err error) {
+func (c *webClient) IMOpen(user string) (channel string, err error) {
 	values := url.Values{}
 	values.Add("user", user)
 	response, err := c.client.Post("im.open", values)

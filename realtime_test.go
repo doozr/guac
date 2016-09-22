@@ -53,7 +53,7 @@ func TestClosed(t *testing.T) {
 		closed: make(chan struct{}),
 	}
 
-	realTime := RealTimeClient{
+	realTime := realTimeClient{
 		connection: realTimeConnection,
 	}
 
@@ -74,7 +74,7 @@ func receiveEvent(t *testing.T, eventType string, payload string, expected inter
 		},
 	}
 
-	realTime := RealTimeClient{
+	realTime := realTimeClient{
 		connection: realTimeConnection,
 	}
 
@@ -151,7 +151,7 @@ func TestDoesNotReturnUnknown(t *testing.T) {
 		},
 	}
 
-	realTime := RealTimeClient{
+	realTime := realTimeClient{
 		connection: realTimeConnection,
 	}
 
@@ -172,7 +172,7 @@ func TestReceiveError(t *testing.T) {
 		},
 	}
 
-	realTimeClient := RealTimeClient{
+	realTimeClient := realTimeClient{
 		connection: realTimeConnection,
 	}
 
@@ -198,7 +198,7 @@ func TestPing(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{
+	rtm := realTimeClient{
 		connection: realTimeConnection,
 	}
 	err := rtm.Ping()
@@ -229,7 +229,7 @@ func TestPingError(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{
+	rtm := realTimeClient{
 		connection: realTimeConnection,
 	}
 	err := rtm.Ping()
@@ -250,7 +250,7 @@ func TestPostMessage(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{
+	rtm := realTimeClient{
 		connection: realTimeConnection,
 	}
 	channel := "#F00DD00D"
@@ -295,7 +295,7 @@ func TestPostMessageError(t *testing.T) {
 		},
 	}
 
-	rtm := RealTimeClient{
+	rtm := realTimeClient{
 		connection: realTimeConnection,
 	}
 	channel := "#F00DD00D"

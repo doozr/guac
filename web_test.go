@@ -55,7 +55,7 @@ func checkEndpoint(
 			}, nil
 		},
 	}
-	client := WebClient{client: testClient}
+	client := &webClient{client: testClient}
 
 	result, err := fn(client)
 	if err != nil {
@@ -175,7 +175,7 @@ func TestIMOpen(t *testing.T) {
 			}, nil
 		},
 	}
-	client := WebClient{client: testClient}
+	client := webClient{client: testClient}
 
 	channel, err := client.IMOpen("U1234")
 	if err != nil {
