@@ -55,7 +55,13 @@ func (c client) Get(endPoint string, values url.Values) (response Response, err 
 	if err != nil {
 		return
 	}
-	jot.Printf("web.client: GET %s received %s", url, string(bytes))
+	if jot.Enabled() {
+		o := string(bytes)
+		if len(o) > 256 {
+			o = o[:253] + "..."
+		}
+		jot.Printf("web.client: GET %s received %s", url, o)
+	}
 
 	respObj := apiResponse{}
 	err = json.Unmarshal(bytes, &respObj)
@@ -90,7 +96,13 @@ func (c client) Post(endPoint string, values url.Values) (response Response, err
 	if err != nil {
 		return
 	}
-	jot.Printf("web.client: POST to %s received %s", url, string(bytes))
+	if jot.Enabled() {
+		o := string(bytes)
+		if len(o) > 256 {
+			o = o[:253] + "..."
+		}
+		jot.Printf("web.client: POST %s received %s", url, o)
+	}
 
 	respObj := apiResponse{}
 	err = json.Unmarshal(bytes, &respObj)
