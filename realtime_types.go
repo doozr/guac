@@ -1,5 +1,8 @@
 package guac
 
+// EventChan is a channel of any type of event
+type EventChan chan interface{}
+
 // MessageEvent is a chat message sent to a user or channel.
 type MessageEvent struct {
 	Type    string `json:"type"`
