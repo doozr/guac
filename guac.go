@@ -3,6 +3,7 @@ package guac
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/doozr/guac/web"
 )
@@ -32,4 +33,33 @@ func New(token string) WebClient {
 	return &webClient{
 		client: web.New(token, &http.Client{}),
 	}
+}
+
+type stringEncoding struct {
+	raw    string
+	cooked string
+}
+
+var stringEncodings = []stringEncoding{
+	{"&", "&amp;"},
+	{"<", "&lt;"},
+	{">", "&gt;"},
+}
+
+// EncodingString performs limited URL encoding as per Slack encoding standards
+func EncodeString(input string) string {
+	output := input
+	for _, encoding := range stringEncodings {
+		output = strings.Replace(output, encoding.raw, encoding.cooked, -1)
+	}
+	return output
+}
+
+// DecodeString performs limited URL decoding as per Slack encoding standards
+func DecodeString(input string) string {
+	output := input
+	for _, encoding := range stringEncodings {
+		output = strings.Replace(output, encoding.cooked, encoding.raw, -1)
+	}
+	return output
 }
