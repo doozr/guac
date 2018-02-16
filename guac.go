@@ -46,7 +46,7 @@ var stringEncodings = []stringEncoding{
 	{">", "&gt;"},
 }
 
-// EncodingString performs limited URL encoding as per Slack encoding standards
+// EncodeString performs limited URL encoding as per Slack encoding standards
 func EncodeString(input string) string {
 	output := input
 	for _, encoding := range stringEncodings {
