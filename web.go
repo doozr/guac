@@ -150,7 +150,7 @@ func (c *webClient) IMOpen(user string) (channel string, err error) {
 
 func (c *webClient) PostMessage(channel, text string) (err error) {
 	values := url.Values{}
-	values.Add("channel", channel)
+	values.Add("channels", channel)
 	values.Add("text", text)
 	response, err := c.client.Post("chat.postMessage", values)
 	if err != nil {
@@ -166,7 +166,7 @@ func (c *webClient) PostMessage(channel, text string) (err error) {
 
 func (c *webClient) PostSnippet(channel, content, filename, filetype, title, initialComment string) (err error) {
 	values := url.Values{}
-	values.Add("channel", channel)
+	values.Add("channels", channel)
 	values.Add("content", content)
 
 	if filename != "" {
