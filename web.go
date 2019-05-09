@@ -147,3 +147,38 @@ func (c *webClient) IMOpen(user string) (channel string, err error) {
 	}
 	return
 }
+
+func (c *webClient) PostMessage(channel, text string) (err error) {
+	values := url.Values{}
+	values.Add("channel", channel)
+	values.Add("text", text)
+	response, err := c.client.Post("chat.postMessage", values)
+	if err != nil {
+		return
+	}
+
+	if !response.Success() {
+		err = response.Error()
+	}
+
+	return
+}
+
+func (c *webClient) PostSnippet(channel, content, filename, filetype, title, initialComment string) (err error) {
+	values := url.Values{}
+	values.Add("channel", channel)
+	values.Add("content", content)
+	values.Add("filename", filename)
+	values.Add("filetype", filetype)
+	values.Add("initial_comment", initialComment)
+	response, err := c.client.Post("files.upload", values)
+	if err != nil {
+		return
+	}
+
+	if !response.Success() {
+		err = response.Error()
+	}
+
+	return
+}
