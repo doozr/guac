@@ -168,9 +168,19 @@ func (c *webClient) PostSnippet(channel, content, filename, filetype, title, ini
 	values := url.Values{}
 	values.Add("channel", channel)
 	values.Add("content", content)
-	values.Add("filename", filename)
-	values.Add("filetype", filetype)
-	values.Add("initial_comment", initialComment)
+
+	if filename != "" {
+		values.Add("filename", filename)
+	}
+
+	if filetype != "" {
+		values.Add("filetype", filetype)
+	}
+
+	if initialComment != "" {
+		values.Add("initial_comment", initialComment)
+	}
+
 	response, err := c.client.Post("files.upload", values)
 	if err != nil {
 		return
