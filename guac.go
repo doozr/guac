@@ -14,9 +14,9 @@ type WebClient interface {
 	UsersList() ([]UserInfo, error)
 	ChannelsList() ([]ChannelInfo, error)
 	GroupsList() ([]ChannelInfo, error)
-	IMOpen(string) (string, error)
-	PostMessage(string, string) error
-	PostSnippet(string, string, string, string, string, string) error
+	IMOpen(user string) (string, error)
+	PostMessage(channel string, text string) error
+	PostSnippet(channel string, content string, filename string, filetype string, title string, initialComment string) error
 }
 
 // RealTimeClient is a client of the Slack RealTime API.
